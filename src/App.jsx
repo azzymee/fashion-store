@@ -963,6 +963,93 @@ function SuccessPage({ onHome }) {
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
+function HelpPage({ onBack }) {
+  const sections = [
+    {
+      title: "Getting Started",
+      items: [
+        { q: "How do I create an account?", a: "Tap Sign Up on the login page, enter your name, email and password (min 6 characters), then tap Create Account." },
+        { q: "How do I sign in?", a: "Enter your email and password on the login page and tap Sign In." },
+        { q: "I forgot my password", a: "Enter your email on the login page, tap Forgot Password, then check your email for a reset link." },
+        { q: "Can I use the app without an account?", a: "Yes, tap Continue as Guest. Note that guests cannot view order history." },
+      ]
+    },
+    {
+      title: "Shopping",
+      items: [
+        { q: "How do I find a product?", a: "Go to Shop and use the search bar or category buttons to filter products." },
+        { q: "How do I add to cart?", a: "Tap Add to Cart on any product card. The cart count in the top bar updates automatically." },
+        { q: "How do I share a product?", a: "Tap the green phone icon on any product card to share it on WhatsApp." },
+      ]
+    },
+    {
+      title: "Virtual Try-On",
+      items: [
+        { q: "How do I try on a garment?", a: "Tap Try On on any product, upload your photo, then tap Generate AI Try-On. Results take 30-60 seconds." },
+        { q: "How do I get the best try-on result?", a: "Use a clear photo standing straight with a plain background and good lighting, facing the camera directly." },
+        { q: "How do I save my try-on result?", a: "Tap Save Image after the result appears to download it to your device." },
+        { q: "The try-on failed. What do I do?", a: "Wait 5 minutes and try again. The AI has a usage limit that resets every hour." },
+      ]
+    },
+    {
+      title: "Checkout & Orders",
+      items: [
+        { q: "What payment methods are accepted?", a: "Card payment, Bank Transfer (GTBank), and Cash on Delivery (Lagos only)." },
+        { q: "How do I track my order?", a: "Tap Orders in the navigation bar to see all your past orders." },
+        { q: "Will I get a receipt?", a: "Yes, a WhatsApp receipt is generated automatically after every order." },
+      ]
+    },
+    {
+      title: "Troubleshooting",
+      items: [
+        { q: "The site is slow to load", a: "Wait 30-60 seconds on first visit. The server wakes up when you visit." },
+        { q: "Images are not showing", a: "Check your internet connection and refresh the page." },
+        { q: "My cart is empty after logging in", a: "The cart resets when you log out. Add your items again after signing in." },
+      ]
+    },
+  ];
+
+  return (
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <button onClick={onBack} style={{
+        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
+        color: C.textLight, padding: "8px 16px", cursor: "pointer",
+        marginBottom: "20px", fontSize: "14px",
+      }}>← Back</button>
+
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: C.primary, marginBottom: "8px" }}>User Guide</h2>
+      <p style={{ color: C.textMuted, marginBottom: "30px" }}>Everything you need to know about using TechFit.</p>
+
+      {sections.map(section => (
+        <div key={section.title} style={{ marginBottom: "30px" }}>
+          <h3 style={{
+            fontSize: "18px", fontWeight: 800, color: C.primary,
+            borderBottom: `2px solid ${C.accent}`, paddingBottom: "8px", marginBottom: "16px"
+          }}>{section.title}</h3>
+          {section.items.map(item => (
+            <div key={item.q} style={{
+              background: C.bgCard, borderRadius: "10px", padding: "16px",
+              marginBottom: "10px", border: `1px solid ${C.border}`
+            }}>
+              <div style={{ fontWeight: 700, color: C.text, marginBottom: "6px", fontSize: "14px" }}>{item.q}</div>
+              <div style={{ color: C.textLight, fontSize: "13px", lineHeight: 1.6 }}>{item.a}</div>
+            </div>
+          ))}
+        </div>
+      ))}
+
+      <div style={{
+        background: C.primary, borderRadius: "12px", padding: "20px",
+        textAlign: "center", marginTop: "20px"
+      }}>
+        <div style={{ color: "#fff", fontWeight: 700, marginBottom: "4px" }}>Need more help?</div>
+        <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px" }}>
+          Contact Apex Software Corp. · University of Ilorin
+        </div>
+      </div>
+    </div>
+  );
+}
 export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -1077,14 +1164,23 @@ export default function App() {
       {page === "checkout" && <CheckoutPage cart={cart} user={user} onSuccess={handleSuccess} />}
       {page === "success"  && <SuccessPage onHome={() => setPage("shop")} />}
       {page === "orders"   && <OrderHistory user={user} onBack={() => setPage("home")} />}
+        {page === "help" && <HelpPage onBack={() => setPage("home")} />}
 
       {/* Footer */}
-      <footer style={{
-        background: C.primary, color: "rgba(255,255,255,0.6)",
-        textAlign: "center", padding: "20px", fontSize: "13px", marginTop: "40px",
-      }}>
-        © 2025 TechFit · University of Ilorin · Built by Apex Software corp.
-      </footer>
+    <footer style={{
+  background: C.primary, color: "rgba(255,255,255,0.6)",
+  textAlign: "center", padding: "20px", fontSize: "13px", marginTop: "40px",
+}}>
+  © 2025 TechFit · University of Ilorin · Built by Apex Software corp.
+  <span style={{ margin: "0 10px" }}>·</span>
+  <span
+    onClick={() => setPage("help")}
+    style={{ color: "rgba(255,255,255,0.8)", cursor: "pointer", textDecoration: "underline" }}
+  >
+    User Guide
+  </span>
+</footer>
+      
     </div>
   );
 }

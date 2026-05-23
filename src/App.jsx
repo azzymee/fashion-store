@@ -18,120 +18,164 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
+/* ─── Google Fonts injection ────────────────────────────────────────────────── */
+if (typeof document !== "undefined" && !document.getElementById("techfit-fonts")) {
+  const link = document.createElement("link");
+  link.id = "techfit-fonts";
+  link.rel = "stylesheet";
+  link.href =
+    "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap";
+  document.head.appendChild(link);
+}
+
+// ─── Design Tokens ────────────────────────────────────────────────────────────
 const C = {
-  primary: "#1a2f5e",
-  primaryLight: "#2a4a8e",
-  accent: "#3a6bc4",
-  bg: "#f5f0e8",
-  bgCard: "#ffffff",
-  bgDark: "#f0ece4",
-  text: "#1a1a1a",
-  textLight: "#555555",
-  textMuted: "#888888",
-  border: "#ddd8ce",
-  cream: "#f5f0e8",
-  green: "#25D366",
-  success: "#27ae60",
+  navy:         "#0f1f45",
+  navyMid:      "#162a5c",
+  navyLight:    "#1e3a7a",
+  gold:         "#c9a84c",
+  goldLight:    "#e4c47a",
+  cream:        "#faf7f2",
+  creamDark:    "#f0ebe0",
+  white:        "#ffffff",
+  text:         "#0f1f45",
+  textMid:      "#4a5568",
+  textLight:    "#718096",
+  textMuted:    "#a0aec0",
+  border:       "#e2ddd4",
+  borderLight:  "#ede9e0",
+  green:        "#25D366",
+  success:      "#1a9e5f",
+  error:        "#c0392b",
+  shadow:       "rgba(15,31,69,0.10)",
+  shadowMd:     "rgba(15,31,69,0.16)",
+  shadowLg:     "rgba(15,31,69,0.24)",
+};
+
+const F = {
+  display: "'Playfair Display', Georgia, serif",
+  body:    "'DM Sans', 'Segoe UI', sans-serif",
 };
 
 // ─── Products ─────────────────────────────────────────────────────────────────
 const PRODUCTS = [
-  {
-    id: 1, name: "Bodycon Dress", price: 4500, category: "Dresses",
-    image: "/bodycon-dress.jpg",
-    description: "Sleek & form-fitting for any evening out.",
-    rating: 4.5, reviews: 128,
-    colors: ["#1a1a1a", "#8B4513", "#c0392b"],
-  },
-  {
-    id: 2, name: "Floral Gown", price: 7800, category: "Dresses",
-    image: "/floral-gown.jpg",
-    description: "Elegant floral patterns for special occasions.",
-    rating: 4.7, reviews: 94,
-    colors: ["#e91e63", "#9c27b0", "#ffffff"],
-  },
-  {
-    id: 3, name: "Maxi Gown", price: 6200, category: "Dresses",
-    image: "/maxi-gown.jpg",
-    description: "Flowing maxi silhouette, effortlessly chic.",
-    rating: 4.6, reviews: 77,
-    colors: ["#2196f3", "#009688", "#ff5722"],
-  },
-  {
-    id: 4, name: "Midi Skirt", price: 3200, category: "Bottoms",
-    image: "/midi-skirt.jpg",
-    description: "Versatile midi length for work or weekend.",
-    rating: 4.3, reviews: 56,
-    colors: ["#607d8b", "#795548", "#000000"],
-  },
-  {
-    id: 5, name: "Mini Skirt", price: 2800, category: "Bottoms",
-    image: "/mini-skirt.jpg",
-    description: "Bold mini cut, perfect for a night out.",
-    rating: 4.4, reviews: 88,
-    colors: ["#f06292", "#ba68c8", "#4fc3f7"],
-  },
-  {
-    id: 6, name: "Cargo Pants", price: 4100, category: "Bottoms",
-    image: "/cargo-pants.jpg",
-    description: "Utility-meets-style cargo with side pockets.",
-    rating: 4.2, reviews: 43,
-    colors: ["#6d4c41", "#37474f", "#558b2f"],
-  },
-  {
-    id: 7, name: "Wide Leg Pants", price: 4600, category: "Bottoms",
-    image: "/wide-leg-pants.jpg",
-    description: "Relaxed wide-leg cut, tailored finish.",
-    rating: 4.5, reviews: 61,
-    colors: ["#ffffff", "#212121", "#b0bec5"],
-  },
-  {
-    id: 8, name: "Slim Trousers", price: 3900, category: "Bottoms",
-    image: "/slim-trousers.jpg",
-    description: "Sharp slim fit for a polished look.",
-    rating: 4.3, reviews: 39,
-    colors: ["#1a237e", "#37474f", "#4e342e"],
-  },
-  {
-    id: 9, name: "Polo Shirt", price: 2500, category: "Tops",
-    image: "/polo-shirt.jpg",
-    description: "Classic polo for smart casual days.",
-    rating: 4.1, reviews: 72,
-    colors: ["#ffffff", "#1565c0", "#2e7d32"],
-  },
-  {
-    id: 10, name: "Hoodie", price: 5500, category: "Tops",
-    image: "/hoodie.jpg",
-    description: "Cozy premium hoodie for cool evenings.",
-    rating: 4.8, reviews: 115,
-    colors: ["#424242", "#b71c1c", "#1a237e"],
-  },
-  {
-    id: 11, name: "Bucket Hat", price: 1800, category: "Accessories",
-    image: "/bucket-hat.jpg",
-    description: "Trendy bucket hat to complete any look.",
-    rating: 4.0, reviews: 34,
-    colors: ["#f9a825", "#1b5e20", "#880e4f"],
-  },
-  {
-    id: 12, name: "Snapback Cap", price: 2200, category: "Accessories",
-    image: "/snapback-cap.jpg",
-    description: "Streetwear snapback with adjustable fit.",
-    rating: 4.2, reviews: 49,
-    colors: ["#212121", "#c62828", "#1565c0"],
-  },
+  { id: 1,  name: "Bodycon Dress",   price: 4500, category: "Dresses",     image: "/bodycon-dress.jpg",    description: "Sleek & form-fitting for any evening out.",          rating: 4.5, reviews: 128, colors: ["#1a1a1a","#8B4513","#c0392b"] },
+  { id: 2,  name: "Floral Gown",     price: 7800, category: "Dresses",     image: "/floral-gown.jpg",      description: "Elegant floral patterns for special occasions.",      rating: 4.7, reviews: 94,  colors: ["#e91e63","#9c27b0","#ffffff"] },
+  { id: 3,  name: "Maxi Gown",       price: 6200, category: "Dresses",     image: "/maxi-gown.jpg",        description: "Flowing maxi silhouette, effortlessly chic.",         rating: 4.6, reviews: 77,  colors: ["#2196f3","#009688","#ff5722"] },
+  { id: 4,  name: "Midi Skirt",      price: 3200, category: "Bottoms",     image: "/midi-skirt.jpg",       description: "Versatile midi length for work or weekend.",          rating: 4.3, reviews: 56,  colors: ["#607d8b","#795548","#000000"] },
+  { id: 5,  name: "Mini Skirt",      price: 2800, category: "Bottoms",     image: "/mini-skirt.jpg",       description: "Bold mini cut, perfect for a night out.",             rating: 4.4, reviews: 88,  colors: ["#f06292","#ba68c8","#4fc3f7"] },
+  { id: 6,  name: "Cargo Pants",     price: 4100, category: "Bottoms",     image: "/cargo-pants.jpg",      description: "Utility-meets-style cargo with side pockets.",        rating: 4.2, reviews: 43,  colors: ["#6d4c41","#37474f","#558b2f"] },
+  { id: 7,  name: "Wide Leg Pants",  price: 4600, category: "Bottoms",     image: "/wide-leg-pants.jpg",   description: "Relaxed wide-leg cut, tailored finish.",              rating: 4.5, reviews: 61,  colors: ["#ffffff","#212121","#b0bec5"] },
+  { id: 8,  name: "Slim Trousers",   price: 3900, category: "Bottoms",     image: "/slim-trousers.jpg",    description: "Sharp slim fit for a polished look.",                 rating: 4.3, reviews: 39,  colors: ["#1a237e","#37474f","#4e342e"] },
+  { id: 9,  name: "Polo Shirt",      price: 2500, category: "Tops",        image: "/polo-shirt.jpg",       description: "Classic polo for smart casual days.",                 rating: 4.1, reviews: 72,  colors: ["#ffffff","#1565c0","#2e7d32"] },
+  { id: 10, name: "Hoodie",          price: 5500, category: "Tops",        image: "/hoodie.jpg",           description: "Cozy premium hoodie for cool evenings.",              rating: 4.8, reviews: 115, colors: ["#424242","#b71c1c","#1a237e"] },
+  { id: 11, name: "Bucket Hat",      price: 1800, category: "Accessories", image: "/bucket-hat.jpg",       description: "Trendy bucket hat to complete any look.",             rating: 4.0, reviews: 34,  colors: ["#f9a825","#1b5e20","#880e4f"] },
+  { id: 12, name: "Snapback Cap",    price: 2200, category: "Accessories", image: "/snapback-cap.jpg",     description: "Streetwear snapback with adjustable fit.",            rating: 4.2, reviews: 49,  colors: ["#212121","#c62828","#1565c0"] },
 ];
 
 const CATEGORIES = ["all", "Tops", "Dresses", "Bottoms", "Accessories"];
 const fmt = (n) => `₦${Number(n).toLocaleString()}`;
 
+// ─── Global Styles ────────────────────────────────────────────────────────────
+const globalStyle = `
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: ${F.body}; background: ${C.cream}; color: ${C.text}; }
+  input, button, select, textarea { font-family: inherit; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  .fade-up  { animation: fadeUp  0.55s cubic-bezier(.22,.68,0,1.2) both; }
+  .fade-in  { animation: fadeIn  0.4s ease both; }
+  .card-hover {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px ${C.shadowMd} !important;
+  }
+  .btn-primary {
+    background: ${C.navy};
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: ${F.body};
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: ${C.navyLight};
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px ${C.shadowMd};
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1.5px solid ${C.border};
+    border-radius: 10px;
+    color: ${C.textMid};
+    font-family: ${F.body};
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .btn-ghost:hover {
+    border-color: ${C.navy};
+    color: ${C.navy};
+    background: rgba(15,31,69,0.04);
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: ${C.navyLight} !important;
+    box-shadow: 0 0 0 3px rgba(30,58,122,0.12);
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: ${C.creamDark}; }
+  ::-webkit-scrollbar-thumb { background: ${C.navyLight}; border-radius: 3px; }
+`;
+
+function InjectStyles() {
+  useEffect(() => {
+    if (document.getElementById("techfit-styles")) return;
+    const s = document.createElement("style");
+    s.id = "techfit-styles";
+    s.textContent = globalStyle;
+    document.head.appendChild(s);
+  }, []);
+  return null;
+}
+
+// ─── Shared Input Style ───────────────────────────────────────────────────────
+const INP = {
+  width: "100%",
+  padding: "12px 16px",
+  borderRadius: "10px",
+  border: `1.5px solid ${C.border}`,
+  background: C.white,
+  color: C.text,
+  fontSize: "14px",
+  fontWeight: "400",
+  transition: "border-color 0.2s",
+};
+
 // ─── Star Rating ──────────────────────────────────────────────────────────────
-function StarRating({ rating }) {
+function StarRating({ rating, size = 12 }) {
   return (
-    <span style={{ color: "#d97706", fontSize: "12px" }}>
-      {"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}
-      <span style={{ color: C.textMuted, marginLeft: "4px" }}>{rating}</span>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+      <span style={{ color: C.gold, fontSize: size, letterSpacing: "-1px" }}>
+        {"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}
+      </span>
+      <span style={{ color: C.textMuted, fontSize: size - 1, fontWeight: 500 }}>{rating}</span>
     </span>
   );
 }
@@ -139,12 +183,68 @@ function StarRating({ rating }) {
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function Toast({ msg, type }) {
   return (
+    <div className="fade-in" style={{
+      position: "fixed", top: 24, right: 24, zIndex: 9999,
+      background: type === "error" ? C.error : C.navy,
+      color: "#fff", padding: "13px 22px", borderRadius: "12px",
+      fontWeight: 600, fontSize: "14px",
+      boxShadow: `0 8px 28px ${C.shadowLg}`,
+      display: "flex", alignItems: "center", gap: "8px",
+      fontFamily: F.body,
+    }}>
+      <span>{type === "error" ? "⚠️" : "✓"}</span> {msg}
+    </div>
+  );
+}
+
+// ─── Divider ──────────────────────────────────────────────────────────────────
+function GoldDivider({ style }) {
+  return (
     <div style={{
-      position: "fixed", top: 20, right: 20, zIndex: 9999,
-      background: type === "error" ? "#c0392b" : C.primary,
-      color: "#fff", padding: "12px 24px", borderRadius: "10px",
-      fontWeight: 700, fontSize: "14px", boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-    }}>{msg}</div>
+      display: "flex", alignItems: "center", gap: "12px", ...style,
+    }}>
+      <div style={{ flex: 1, height: "1px", background: C.border }} />
+      <div style={{ width: "6px", height: "6px", background: C.gold, borderRadius: "50%", transform: "rotate(45deg)" }} />
+      <div style={{ flex: 1, height: "1px", background: C.border }} />
+    </div>
+  );
+}
+
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+function PageWrapper({ children, style }) {
+  return (
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px", ...style }}>
+      {children}
+    </div>
+  );
+}
+
+// ─── Page Title ───────────────────────────────────────────────────────────────
+function PageTitle({ title, subtitle }) {
+  return (
+    <div style={{ marginBottom: "36px" }}>
+      <h2 className="fade-up" style={{
+        fontFamily: F.display, fontSize: "clamp(26px,4vw,38px)",
+        fontWeight: 700, color: C.navy, lineHeight: 1.15, marginBottom: "8px",
+      }}>{title}</h2>
+      {subtitle && (
+        <p className="fade-up" style={{
+          fontSize: "15px", color: C.textMid, fontWeight: 400,
+          animationDelay: "0.1s",
+        }}>{subtitle}</p>
+      )}
+      <GoldDivider style={{ marginTop: "16px", maxWidth: "200px" }} />
+    </div>
+  );
+}
+
+// ─── Back Button ─────────────────────────────────────────────────────────────
+function BackBtn({ onClick, label = "← Back" }) {
+  return (
+    <button onClick={onClick} className="btn-ghost" style={{
+      padding: "9px 18px", fontSize: "13px", marginBottom: "28px",
+      display: "inline-flex", alignItems: "center", gap: "6px",
+    }}>{label}</button>
   );
 }
 
@@ -248,34 +348,43 @@ function TryOnCanvas({ userPhoto, productImage, category }) {
     <div style={{ position: "relative", width: "100%", maxWidth: "370px" }}>
       {(status === "loading" || status === "detecting") && (
         <div style={{
-          position: "absolute", inset: 0, background: "rgba(245,240,232,0.92)",
+          position: "absolute", inset: 0,
+          background: "rgba(250,247,242,0.94)",
           display: "flex", flexDirection: "column", alignItems: "center",
-          justifyContent: "center", zIndex: 20, borderRadius: "20px",
+          justifyContent: "center", zIndex: 20, borderRadius: "16px",
+          backdropFilter: "blur(4px)",
         }}>
-          <div style={{ fontSize: "36px", marginBottom: "12px" }}>🤖</div>
-          <div style={{ fontWeight: 700, color: C.primary, fontSize: "14px" }}>
-            {status === "loading" ? "Loading AI Model..." : "Detecting body pose..."}
+          <div style={{
+            width: "48px", height: "48px", borderRadius: "50%",
+            border: `3px solid ${C.border}`,
+            borderTopColor: C.navy,
+            animation: "spin 0.8s linear infinite",
+            marginBottom: "14px",
+          }} />
+          <div style={{ fontWeight: 600, color: C.navy, fontSize: "14px" }}>
+            {status === "loading" ? "Loading AI Model…" : "Detecting pose…"}
           </div>
-          <div style={{ fontSize: "12px", color: C.textMuted, marginTop: "6px" }}>Please wait a moment</div>
         </div>
       )}
       <canvas ref={canvasRef} style={{
         width: "100%", height: "450px", objectFit: "cover",
-        borderRadius: "20px", border: `2px solid ${C.border}`,
-        display: "block", background: C.bgDark,
+        borderRadius: "16px", border: `1.5px solid ${C.border}`,
+        display: "block", background: C.creamDark,
       }} />
       {status === "done" && (
         <div style={{
-          position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)",
-          background: "rgba(39,174,96,0.9)", color: "#fff",
-          padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: 700,
+          position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)",
+          background: C.success, color: "#fff",
+          padding: "5px 16px", borderRadius: "20px", fontSize: "12px", fontWeight: 700,
+          whiteSpace: "nowrap",
         }}>✓ AI Try-On Complete</div>
       )}
       {status === "fallback" && (
         <div style={{
-          position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)",
-          background: "rgba(26,47,94,0.85)", color: "#fff",
-          padding: "4px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: 600,
+          position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)",
+          background: "rgba(15,31,69,0.82)", color: "#fff",
+          padding: "5px 16px", borderRadius: "20px", fontSize: "11px", fontWeight: 600,
+          whiteSpace: "nowrap",
         }}>Preview Mode</div>
       )}
     </div>
@@ -318,101 +427,109 @@ function LoginPage({ onLogin }) {
     try {
       await sendPasswordResetEmail(auth, form.email);
       setResetSent(true); setError("");
-    } catch { setError("Could not send reset email. Check your email address."); }
-  };
-
-  const inp = {
-    width: "100%", padding: "12px 16px", borderRadius: "10px",
-    border: `1px solid ${C.border}`, background: "#fff", color: C.text,
-    fontSize: "14px", boxSizing: "border-box", outline: "none", marginBottom: "12px",
+    } catch { setError("Could not send reset email."); }
   };
 
   return (
     <div style={{
       minHeight: "100vh",
-      background: `linear-gradient(160deg, ${C.primary} 0%, ${C.primaryLight} 100%)`,
-      display: "flex", alignItems: "center", justifyContent: "center", padding: "20px",
+      background: `linear-gradient(135deg, ${C.navy} 0%, ${C.navyMid} 50%, #0a1428 100%)`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "20px", fontFamily: F.body,
+      position: "relative", overflow: "hidden",
     }}>
-      <div style={{
-        background: "#fff", borderRadius: "24px", padding: "40px",
-        width: "100%", maxWidth: "420px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+      {/* Decorative circles */}
+      <div style={{ position:"absolute", top:"-120px", right:"-80px", width:"400px", height:"400px", borderRadius:"50%", border:`1px solid rgba(201,168,76,0.15)`, pointerEvents:"none" }} />
+      <div style={{ position:"absolute", top:"-60px", right:"-20px", width:"260px", height:"260px", borderRadius:"50%", border:`1px solid rgba(201,168,76,0.10)`, pointerEvents:"none" }} />
+      <div style={{ position:"absolute", bottom:"-100px", left:"-60px", width:"300px", height:"300px", borderRadius:"50%", border:`1px solid rgba(201,168,76,0.08)`, pointerEvents:"none" }} />
+
+      <div className="fade-up" style={{
+        background: C.white, borderRadius: "20px", padding: "44px 40px",
+        width: "100%", maxWidth: "420px",
+        boxShadow: `0 32px 80px rgba(0,0,0,0.35)`,
       }}>
+        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <img
-            src="/unilorin-logo.png"
-            alt="Unilorin"
-            style={{ height: "56px", display: "block", margin: "0 auto 14px" }}
-            onError={e => (e.target.style.display = "none")}
-          />
-          <div style={{ fontSize: "38px", lineHeight: 1, marginBottom: "6px" }}>👗</div>
-          <h1 style={{ fontSize: "28px", fontWeight: 900, color: C.primary, margin: "0 0 4px" }}>TechFit</h1>
-          <p style={{ color: C.textMuted, fontSize: "13px", margin: 0 }}>University of Ilorin · Fashion Store</p>
+          <img src="/unilorin-logo.png" alt="Unilorin"
+            style={{ height: "48px", display: "block", margin: "0 auto 16px" }}
+            onError={e => (e.target.style.display = "none")} />
+          <h1 style={{ fontFamily: F.display, fontSize: "32px", fontWeight: 700, color: C.navy, margin: "0 0 4px", letterSpacing: "-0.5px" }}>
+            TechFit
+          </h1>
+          <p style={{ color: C.textMuted, fontSize: "13px", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+            University of Ilorin · Fashion Store
+          </p>
+          <GoldDivider style={{ marginTop: "16px" }} />
         </div>
 
+        {/* Toggle */}
         <div style={{
-          display: "flex", background: C.bgDark, borderRadius: "12px",
+          display: "flex", background: C.creamDark, borderRadius: "12px",
           padding: "4px", marginBottom: "24px",
         }}>
           {["login", "signup"].map(m => (
             <button key={m} onClick={() => { setMode(m); setError(""); setResetSent(false); }} style={{
               flex: 1, padding: "10px", borderRadius: "9px", border: "none",
-              background: mode === m ? C.primary : "transparent",
+              background: mode === m ? C.navy : "transparent",
               color: mode === m ? "#fff" : C.textMuted,
-              fontWeight: mode === m ? 700 : 400,
-              cursor: "pointer", fontSize: "14px", transition: "all 0.2s",
+              fontWeight: mode === m ? 600 : 400,
+              cursor: "pointer", fontSize: "14px",
+              transition: "all 0.2s", fontFamily: F.body,
             }}>
               {m === "login" ? "Sign In" : "Sign Up"}
             </button>
           ))}
         </div>
 
-        {mode === "signup" && (
-          <input placeholder="Full Name" value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })} style={inp} />
-        )}
-        <input placeholder="Email Address" value={form.email}
-          onChange={e => setForm({ ...form, email: e.target.value })} style={inp} type="email" />
-        <input placeholder="Password (min 6 characters)" type="password" value={form.password}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-          style={{ ...inp, marginBottom: "8px" }}
-          onKeyDown={e => e.key === "Enter" && handle()} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {mode === "signup" && (
+            <input placeholder="Full Name" value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })} style={INP} />
+          )}
+          <input placeholder="Email address" value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })} style={INP} type="email" />
+          <input placeholder="Password (min 6 characters)" type="password" value={form.password}
+            onChange={e => setForm({ ...form, password: e.target.value })} style={INP}
+            onKeyDown={e => e.key === "Enter" && handle()} />
+        </div>
 
         {mode === "login" && (
           <button onClick={handleForgotPassword} style={{
-            background: "none", border: "none", color: C.accent,
+            background: "none", border: "none", color: C.navyLight,
             fontSize: "13px", cursor: "pointer", textAlign: "right",
-            width: "100%", marginBottom: "8px", display: "block",
-          }}>Forgot Password?</button>
+            width: "100%", marginTop: "8px", fontFamily: F.body, fontWeight: 500,
+          }}>Forgot password?</button>
         )}
 
         {resetSent && (
-          <div style={{ color: C.success, fontSize: "13px", marginBottom: "10px", background: "#e8f5e9", padding: "8px 12px", borderRadius: "8px" }}>
-            ✓ Password reset email sent! Check your inbox.
+          <div style={{ color: C.success, fontSize: "13px", marginTop: "10px", background: "#eafaf3", padding: "10px 14px", borderRadius: "8px", border: `1px solid #b7e4cf` }}>
+            ✓ Reset link sent — check your inbox.
           </div>
         )}
         {error && (
-          <div style={{ color: "#c0392b", fontSize: "13px", marginBottom: "12px", background: "#fdf0f0", padding: "8px 12px", borderRadius: "8px" }}>
+          <div style={{ color: C.error, fontSize: "13px", marginTop: "10px", background: "#fdf0f0", padding: "10px 14px", borderRadius: "8px", border: `1px solid #f5c6cb` }}>
             {error}
           </div>
         )}
 
-        <button onClick={handle} disabled={loading} style={{
-          width: "100%", padding: "14px",
-          background: loading ? C.border : C.primary,
-          border: "none", borderRadius: "12px",
-          color: loading ? C.textMuted : "#fff",
-          fontWeight: 900, fontSize: "15px",
-          cursor: loading ? "wait" : "pointer", marginBottom: "12px",
+        <button onClick={handle} disabled={loading} className="btn-primary" style={{
+          width: "100%", padding: "14px", marginTop: "20px",
+          fontSize: "15px", fontWeight: 700, borderRadius: "12px",
+          opacity: loading ? 0.7 : 1, letterSpacing: "0.2px",
         }}>
-          {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+          {loading ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
         </button>
-        <button onClick={() => onLogin({ name: "Guest", email: "guest@techfit.com", uid: "guest" })} style={{
-          width: "100%", padding: "12px", background: "transparent",
-          border: `1px solid ${C.border}`, borderRadius: "12px",
-          color: C.textLight, fontWeight: 600, fontSize: "14px", cursor: "pointer",
-        }}>
-          Continue as Guest
-        </button>
+
+        <div style={{ textAlign: "center", marginTop: "14px" }}>
+          <button onClick={() => onLogin({ name: "Guest", email: "guest@techfit.com", uid: "guest" })}
+            style={{
+              background: "none", border: "none", color: C.textMuted,
+              fontSize: "13px", cursor: "pointer", fontFamily: F.body,
+              textDecoration: "underline",
+            }}>
+            Continue as Guest
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -427,11 +544,7 @@ function OrderHistory({ user, onBack }) {
     if (!user?.uid || user.uid === "guest") { setLoading(false); return; }
     (async () => {
       try {
-        const q = query(
-          collection(db, "orders"),
-          where("userId", "==", user.uid),
-          orderBy("createdAt", "desc")
-        );
+        const q = query(collection(db, "orders"), where("userId","==",user.uid), orderBy("createdAt","desc"));
         const snap = await getDocs(q);
         setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (err) { console.error(err); }
@@ -446,121 +559,191 @@ function OrderHistory({ user, onBack }) {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <button onClick={onBack} style={{
-        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
-        color: C.textLight, padding: "8px 16px", cursor: "pointer",
-        marginBottom: "20px", fontSize: "14px",
-      }}>← Back</button>
-      <h2 style={{ fontSize: "28px", fontWeight: 900, margin: "0 0 24px", color: C.text }}>Order History</h2>
+    <PageWrapper>
+      <BackBtn onClick={onBack} />
+      <PageTitle title="Order History" subtitle="A record of all your TechFit purchases." />
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "40px", color: C.textMuted }}>Loading orders...</div>
+        <div style={{ textAlign: "center", padding: "60px", color: C.textMuted, fontSize: "15px" }}>Loading orders…</div>
       ) : user.uid === "guest" ? (
-        <div style={{ textAlign: "center", padding: "60px 20px" }}>
-          <div style={{ fontSize: "48px" }}>🔐</div>
-          <h3 style={{ color: C.textMuted, marginTop: "16px" }}>Sign in to view order history</h3>
+        <div style={{ textAlign: "center", padding: "80px 20px" }}>
+          <div style={{ fontSize: "52px", marginBottom: "16px" }}>🔐</div>
+          <h3 style={{ fontFamily: F.display, color: C.navy, marginBottom: "8px" }}>Sign in to view orders</h3>
+          <p style={{ color: C.textLight }}>Guest accounts do not have order history.</p>
         </div>
       ) : orders.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 20px" }}>
-          <div style={{ fontSize: "48px" }}>📦</div>
-          <h3 style={{ color: C.textMuted, marginTop: "16px" }}>No orders yet</h3>
+        <div style={{ textAlign: "center", padding: "80px 20px" }}>
+          <div style={{ fontSize: "52px", marginBottom: "16px" }}>📦</div>
+          <h3 style={{ fontFamily: F.display, color: C.navy, marginBottom: "8px" }}>No orders yet</h3>
           <p style={{ color: C.textLight }}>Start shopping to see your orders here!</p>
         </div>
       ) : (
-        orders.map(order => (
-          <div key={order.id} style={{
-            background: C.bgCard, borderRadius: "14px", padding: "20px",
-            marginBottom: "16px", border: `1px solid ${C.border}`,
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
-              <div>
-                <div style={{ fontWeight: 700, color: C.text, fontSize: "15px" }}>Order #{order.id.slice(-6).toUpperCase()}</div>
-                <div style={{ fontSize: "12px", color: C.textMuted }}>{order.createdAt?.toDate?.()?.toLocaleDateString() || "Recent"}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {orders.map(order => (
+            <div key={order.id} className="card-hover" style={{
+              background: C.white, borderRadius: "16px", padding: "24px",
+              border: `1.5px solid ${C.borderLight}`,
+              boxShadow: `0 2px 12px ${C.shadow}`,
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
+                <div>
+                  <div style={{ fontFamily: F.display, fontWeight: 700, color: C.navy, fontSize: "16px" }}>
+                    Order #{order.id.slice(-6).toUpperCase()}
+                  </div>
+                  <div style={{ fontSize: "12px", color: C.textMuted, marginTop: "2px" }}>
+                    {order.createdAt?.toDate?.()?.toLocaleDateString("en-GB", { day:"numeric", month:"long", year:"numeric" }) || "Recent"}
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontFamily: F.display, fontWeight: 700, color: C.navy, fontSize: "18px" }}>{fmt(order.total)}</div>
+                  <span style={{ fontSize: "11px", background: "#eafaf3", color: C.success, padding: "3px 10px", borderRadius: "20px", fontWeight: 700, display: "inline-block", marginTop: "4px" }}>✓ Confirmed</span>
+                </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontWeight: 900, color: C.primary, fontSize: "16px" }}>{fmt(order.total)}</div>
-                <div style={{ fontSize: "12px", background: "#e8f5e9", color: C.success, padding: "2px 8px", borderRadius: "6px", fontWeight: 700 }}>✓ Confirmed</div>
-              </div>
-            </div>
-            <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: "12px" }}>
+              <GoldDivider style={{ marginBottom: "14px" }} />
               {order.items?.map((item, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: C.textLight, padding: "4px 0" }}>
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: C.textMid, padding: "5px 0", borderBottom: i < order.items.length - 1 ? `1px solid ${C.borderLight}` : "none" }}>
                   <span>{item.name} × {item.qty}</span>
-                  <span>{fmt(item.price * item.qty)}</span>
+                  <span style={{ fontWeight: 600 }}>{fmt(item.price * item.qty)}</span>
                 </div>
               ))}
+              <div style={{ marginTop: "14px", fontSize: "12px", color: C.textMuted }}>
+                📍 {order.address} &nbsp;·&nbsp; 📞 {order.phone}
+              </div>
+              <button onClick={() => shareOrder(order)} style={{
+                marginTop: "14px", padding: "8px 20px", background: C.green,
+                border: "none", borderRadius: "8px", color: "#fff",
+                fontWeight: 700, fontSize: "13px", cursor: "pointer",
+                fontFamily: F.body,
+              }}>📱 Share on WhatsApp</button>
             </div>
-            <div style={{ marginTop: "10px", fontSize: "12px", color: C.textMuted }}>
-              📍 {order.address} | 📞 {order.phone}
-            </div>
-            <button onClick={() => shareOrder(order)} style={{
-              marginTop: "12px", padding: "8px 18px", background: C.green,
-              border: "none", borderRadius: "8px", color: "#fff",
-              fontWeight: 700, fontSize: "13px", cursor: "pointer",
-            }}>📱 Share on WhatsApp</button>
-          </div>
-        ))
+          ))}
+        </div>
       )}
-    </div>
+    </PageWrapper>
   );
 }
 
 // ─── Home Page ────────────────────────────────────────────────────────────────
 function HomePage({ onShop, user }) {
   return (
-    <div style={{
-      minHeight: "80vh", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      textAlign: "center", padding: "40px 20px",
-      background: `linear-gradient(160deg, ${C.primary} 0%, ${C.primaryLight} 100%)`,
-    }}>
-      <img
-        src="/unilorin-logo.png"
-        alt="Unilorin"
-        style={{ height: "64px", display: "block", marginBottom: "20px" }}
-        onError={e => (e.target.style.display = "none")}
-      />
-      <div style={{ fontSize: "52px", lineHeight: 1, marginBottom: "10px" }}>👗</div>
-      <h1 style={{
-        fontSize: "clamp(32px, 6vw, 60px)", fontWeight: 900,
-        margin: "0 0 6px", color: "#fff", letterSpacing: "-1px",
-      }}>TechFit</h1>
-
-      {user && (
-        <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "16px", margin: "0 0 10px" }}>
-          Welcome back, {user.name}! 👋
-        </p>
-      )}
-
-      <p style={{
-        fontSize: "17px", color: "rgba(255,255,255,0.75)",
-        maxWidth: "500px", lineHeight: 1.7, margin: "0 0 32px",
+    <div style={{ fontFamily: F.body }}>
+      {/* Hero */}
+      <div style={{
+        background: `linear-gradient(135deg, ${C.navy} 0%, ${C.navyMid} 55%, #0a1428 100%)`,
+        minHeight: "92vh",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        textAlign: "center",
+        position: "relative", overflow: "hidden",
+        padding: "80px 24px 60px",
       }}>
-        Nigeria's premium online fashion store.<br />
-        Shop the latest styles and try them on virtually before you buy.
-      </p>
+        {/* Decorative rings */}
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"700px", height:"700px", borderRadius:"50%", border:`1px solid rgba(201,168,76,0.08)`, pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"500px", height:"500px", borderRadius:"50%", border:`1px solid rgba(201,168,76,0.10)`, pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"300px", height:"300px", borderRadius:"50%", border:`1px solid rgba(201,168,76,0.14)`, pointerEvents:"none" }} />
 
-      <button
-        onClick={onShop}
-        style={{
-          padding: "14px 40px", background: C.cream,
-          border: "2px solid #fff", borderRadius: "14px",
-          color: C.primary, fontWeight: 800, fontSize: "16px", cursor: "pointer",
-        }}
-        onMouseEnter={e => { e.target.style.background = "transparent"; e.target.style.color = "#fff"; }}
-        onMouseLeave={e => { e.target.style.background = C.cream; e.target.style.color = C.primary; }}
-      >
-        Shop Now 🛍️
-      </button>
+        <div style={{ position: "relative", zIndex: 2, maxWidth: "640px" }}>
+          <img src="/unilorin-logo.png" alt="Unilorin"
+            style={{ height: "56px", display: "block", margin: "0 auto 28px" }}
+            onError={e => (e.target.style.display = "none")} />
 
-      <div style={{ display: "flex", gap: "40px", marginTop: "60px", flexWrap: "wrap", justifyContent: "center" }}>
-        {[["500+", "Products"], ["50k+", "Customers"], ["4.8★", "Rating"], ["Free", "Returns"]].map(([v, l]) => (
-          <div key={l} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "26px", fontWeight: 900, color: C.cream }}>{v}</div>
-            <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>{l}</div>
+          <div className="fade-up" style={{ display: "inline-block", background: "rgba(201,168,76,0.15)", border: `1px solid rgba(201,168,76,0.35)`, borderRadius: "20px", padding: "5px 18px", marginBottom: "20px" }}>
+            <span style={{ fontSize: "12px", color: C.goldLight, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+              Nigeria's Premier Fashion Destination
+            </span>
           </div>
-        ))}
+
+          <h1 className="fade-up" style={{
+            fontFamily: F.display,
+            fontSize: "clamp(48px, 8vw, 80px)",
+            fontWeight: 900, color: C.white,
+            lineHeight: 1.08, margin: "0 0 8px",
+            letterSpacing: "-1.5px",
+            animationDelay: "0.1s",
+          }}>
+            Tech<span style={{ color: C.gold }}>Fit</span>
+          </h1>
+
+          {user && user.uid !== "guest" && (
+            <p className="fade-up" style={{ color: "rgba(255,255,255,0.75)", fontSize: "16px", marginBottom: "8px", animationDelay: "0.15s" }}>
+              Welcome back, <strong style={{ color: C.goldLight }}>{user.name}</strong>
+            </p>
+          )}
+
+          <p className="fade-up" style={{
+            fontSize: "17px", color: "rgba(255,255,255,0.65)",
+            lineHeight: 1.75, margin: "16px auto 36px",
+            maxWidth: "480px", animationDelay: "0.2s",
+          }}>
+            Shop the latest styles with confidence — try on any garment virtually before you buy.
+          </p>
+
+          <div className="fade-up" style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", animationDelay: "0.28s" }}>
+            <button onClick={onShop} className="btn-primary" style={{
+              padding: "15px 40px", fontSize: "15px", fontWeight: 700,
+              borderRadius: "12px", letterSpacing: "0.3px",
+              background: C.gold, color: C.navy,
+            }}>
+              Shop the Collection
+            </button>
+            <button onClick={onShop} className="btn-ghost" style={{
+              padding: "15px 32px", fontSize: "15px", fontWeight: 600,
+              borderRadius: "12px", borderColor: "rgba(255,255,255,0.25)",
+              color: "rgba(255,255,255,0.85)",
+            }}>
+              Try On Virtually →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Bar */}
+      <div style={{
+        background: C.white,
+        borderBottom: `1px solid ${C.borderLight}`,
+        padding: "0",
+      }}>
+        <div style={{
+          maxWidth: "900px", margin: "0 auto",
+          display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+        }}>
+          {[
+            ["500+",  "Products",   "🧥"],
+            ["50k+",  "Customers",  "👥"],
+            ["4.8★",  "Rating",     "⭐"],
+            ["Free",  "Returns",    "📦"],
+          ].map(([v, l, icon]) => (
+            <div key={l} style={{
+              textAlign: "center", padding: "28px 16px",
+              borderRight: `1px solid ${C.borderLight}`,
+            }}>
+              <div style={{ fontSize: "22px", marginBottom: "4px" }}>{icon}</div>
+              <div style={{ fontFamily: F.display, fontSize: "24px", fontWeight: 700, color: C.navy, lineHeight: 1 }}>{v}</div>
+              <div style={{ fontSize: "12px", color: C.textMuted, marginTop: "4px", letterSpacing: "0.5px", textTransform: "uppercase" }}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Feature strip */}
+      <div style={{ background: C.creamDark, padding: "48px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "24px" }}>
+          {[
+            { icon:"🤖", title:"AI Virtual Try-On",      desc:"See exactly how a garment looks on your body before purchasing." },
+            { icon:"🚚", title:"Free Nationwide Delivery",desc:"Complimentary delivery on every order, anywhere in Nigeria." },
+            { icon:"↩️", title:"Hassle-Free Returns",     desc:"Not happy? Return any item within 30 days, no questions asked." },
+            { icon:"🔒", title:"Secure Payments",         desc:"Card, bank transfer, or cash on delivery — all fully protected." },
+          ].map(f => (
+            <div key={f.title} className="card-hover" style={{
+              background: C.white, borderRadius: "16px", padding: "28px 24px",
+              border: `1.5px solid ${C.borderLight}`,
+              boxShadow: `0 2px 10px ${C.shadow}`,
+            }}>
+              <div style={{ fontSize: "32px", marginBottom: "12px" }}>{f.icon}</div>
+              <div style={{ fontFamily: F.display, fontSize: "16px", fontWeight: 700, color: C.navy, marginBottom: "6px" }}>{f.title}</div>
+              <div style={{ fontSize: "13px", color: C.textMid, lineHeight: 1.7 }}>{f.desc}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -593,87 +776,94 @@ function ShopPage({ cart, setCart, onTryOn }) {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h2 style={{ fontSize: "28px", fontWeight: 900, margin: "0 0 20px", color: C.text }}>Our Collection</h2>
+    <PageWrapper>
+      <PageTitle title="Our Collection" subtitle="Discover premium fashion curated for the modern Nigerian." />
 
-      <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="🔍 Search products..."
-          style={{
-            flex: 1, minWidth: "200px", padding: "10px 16px",
-            borderRadius: "10px", border: `1px solid ${C.border}`,
-            background: C.bgCard, color: C.text, fontSize: "14px", outline: "none",
-          }} />
+      {/* Filters */}
+      <div style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ position: "relative", flex: "1 1 220px" }}>
+          <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontSize: "15px", pointerEvents: "none" }}>🔍</span>
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search products…"
+            style={{ ...INP, paddingLeft: "38px", width: "100%" }} />
+        </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)} style={{
-              padding: "10px 16px", borderRadius: "10px",
-              border: category === cat ? `2px solid ${C.primary}` : `1px solid ${C.border}`,
-              background: category === cat ? C.primary : C.bgCard,
-              color: category === cat ? "#fff" : C.textLight,
-              cursor: "pointer", fontSize: "13px",
-              fontWeight: category === cat ? 700 : 400,
-              textTransform: "capitalize",
-            }}>{cat}</button>
+              padding: "10px 18px", borderRadius: "10px",
+              border: category === cat ? `2px solid ${C.navy}` : `1.5px solid ${C.border}`,
+              background: category === cat ? C.navy : C.white,
+              color: category === cat ? "#fff" : C.textMid,
+              cursor: "pointer", fontSize: "13px", fontWeight: category === cat ? 700 : 500,
+              textTransform: "capitalize", fontFamily: F.body,
+              transition: "all 0.2s",
+            }}>
+              {cat === "all" ? "All Items" : cat}
+            </button>
           ))}
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "20px" }}>
-        {filtered.map(product => (
-          <div key={product.id}
-            style={{
-              background: C.bgCard, borderRadius: "16px",
-              border: `1px solid ${C.border}`, overflow: "hidden",
-              transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 8px 24px rgba(26,47,94,0.15)`; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)"; }}
-          >
-            <div style={{ height: "200px", position: "relative", overflow: "hidden", background: C.bgDark }}>
-              <img src={product.image} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      {/* Product Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: "24px" }}>
+        {filtered.map((product, i) => (
+          <div key={product.id} className="card-hover fade-up" style={{
+            background: C.white, borderRadius: "18px",
+            border: `1.5px solid ${C.borderLight}`, overflow: "hidden",
+            boxShadow: `0 2px 12px ${C.shadow}`,
+            animationDelay: `${i * 0.04}s`,
+          }}>
+            {/* Image area */}
+            <div style={{ height: "210px", position: "relative", overflow: "hidden", background: C.creamDark }}>
+              <img src={product.image} alt={product.name}
+                style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
+                onMouseEnter={e => (e.target.style.transform = "scale(1.06)")}
+                onMouseLeave={e => (e.target.style.transform = "scale(1)")} />
               <div style={{
-                position: "absolute", top: "8px", right: "8px",
-                background: C.primary, borderRadius: "6px",
-                padding: "2px 8px", fontSize: "11px", fontWeight: 700, color: "#fff",
-              }}>{product.category.toUpperCase()}</div>
+                position: "absolute", top: "10px", right: "10px",
+                background: C.navy, borderRadius: "6px",
+                padding: "3px 10px", fontSize: "10px", fontWeight: 700,
+                color: "#fff", letterSpacing: "0.8px", textTransform: "uppercase",
+              }}>{product.category}</div>
               <button onClick={() => shareProduct(product)} style={{
-                position: "absolute", top: "8px", left: "8px",
-                background: C.green, border: "none", borderRadius: "6px",
-                padding: "4px 8px", cursor: "pointer", fontSize: "14px",
+                position: "absolute", top: "10px", left: "10px",
+                background: C.green, border: "none", borderRadius: "8px",
+                padding: "5px 9px", cursor: "pointer", fontSize: "13px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
               }} title="Share on WhatsApp">📱</button>
             </div>
-            <div style={{ padding: "14px" }}>
-              <h3 style={{ margin: "0 0 4px", fontSize: "15px", fontWeight: 700, color: C.text }}>{product.name}</h3>
-              <StarRating rating={product.rating} />
-              <span style={{ fontSize: "11px", color: C.textMuted, marginLeft: "6px" }}>({product.reviews})</span>
-              <p style={{ fontSize: "12px", color: C.textLight, margin: "8px 0", lineHeight: 1.5 }}>{product.description}</p>
-              <div style={{ display: "flex", gap: "6px", margin: "10px 0", flexWrap: "wrap" }}>
+
+            <div style={{ padding: "18px" }}>
+              <h3 style={{ fontFamily: F.display, margin: "0 0 6px", fontSize: "16px", fontWeight: 700, color: C.navy }}>{product.name}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                <StarRating rating={product.rating} />
+                <span style={{ fontSize: "11px", color: C.textMuted }}>({product.reviews})</span>
+              </div>
+              <p style={{ fontSize: "12px", color: C.textMid, margin: "0 0 12px", lineHeight: 1.6 }}>{product.description}</p>
+              <div style={{ display: "flex", gap: "6px", margin: "0 0 14px" }}>
                 {product.colors.map(c => (
-                  <div key={c} style={{ width: "18px", height: "18px", borderRadius: "50%", background: c, border: `2px solid ${C.border}` }} />
+                  <div key={c} style={{ width: "16px", height: "16px", borderRadius: "50%", background: c, border: `2px solid ${C.borderLight}` }} />
                 ))}
               </div>
-              <div style={{ fontSize: "18px", fontWeight: 900, color: C.primary, margin: "8px 0" }}>{fmt(product.price)}</div>
+              <div style={{ fontFamily: F.display, fontSize: "20px", fontWeight: 700, color: C.navy, marginBottom: "14px" }}>{fmt(product.price)}</div>
               <div style={{ display: "flex", gap: "8px" }}>
-                <button onClick={() => addToCart(product)} style={{
-                  flex: 1, padding: "9px",
-                  background: added === product.id ? C.success : C.primary,
-                  border: "none", borderRadius: "9px", color: "#fff",
-                  fontWeight: 700, fontSize: "13px", cursor: "pointer", transition: "background 0.3s",
+                <button onClick={() => addToCart(product)} className="btn-primary" style={{
+                  flex: 1, padding: "10px", fontSize: "13px", fontWeight: 600,
+                  borderRadius: "10px",
+                  background: added === product.id ? C.success : C.navy,
                 }}>
                   {added === product.id ? "✓ Added!" : "Add to Cart"}
                 </button>
-                <button onClick={() => onTryOn(product)} style={{
-                  padding: "9px 12px", background: C.bgDark,
-                  border: `1px solid ${C.primary}`, borderRadius: "9px",
-                  color: C.primary, fontWeight: 700, fontSize: "13px", cursor: "pointer",
+                <button onClick={() => onTryOn(product)} className="btn-ghost" style={{
+                  padding: "10px 14px", fontSize: "13px", fontWeight: 600,
+                  borderRadius: "10px", color: C.navy, borderColor: C.navy,
                 }}>Try On</button>
               </div>
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 
@@ -696,134 +886,116 @@ function TryOnPage({ product, onBack, onAddToCart }) {
 
   const handleTryOn = async () => {
     if (!userPhoto || !product?.image) return;
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
       const garmentResponse = await fetch(product.image);
       const garmentBlob = await garmentResponse.blob();
-      const garmentFile = new File([garmentBlob], 'garment.jpg', { type: garmentBlob.type });
+      const garmentFile = new File([garmentBlob], "garment.jpg", { type: garmentBlob.type });
       const formData = new FormData();
-      formData.append('human', userPhoto);
-      formData.append('garment', garmentFile);
-      const response = await fetch('/api/virtual-tryon', { method: 'POST', body: formData });
+      formData.append("human", userPhoto);
+      formData.append("garment", garmentFile);
+      const response = await fetch("/api/virtual-tryon", { method: "POST", body: formData });
       const data = await response.json();
-      if (!data.success) throw new Error(data.error || 'Try-on failed');
-      const imgSrc = data.outputImage?.url || data.outputImage;
-      setResultImage(imgSrc);
+      if (!data.success) throw new Error(data.error || "Try-on failed");
+      setResultImage(data.outputImage?.url || data.outputImage);
     } catch (err) {
-      setError('Try-on failed: ' + err.message);
+      setError("Try-on failed: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
-      <button onClick={onBack} style={{
-        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
-        color: C.textLight, padding: "8px 16px", cursor: "pointer",
-        marginBottom: "20px", fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "6px",
-      }}>← Back to Shop</button>
+    <PageWrapper>
+      <BackBtn onClick={onBack} label="← Back to Shop" />
+      <PageTitle title="Virtual Try-On" subtitle={`See how ${product?.name} looks on you before you buy.`} />
 
-      <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: 900, color: C.text }}>Virtual Try-On</h2>
-      <p style={{ color: C.textLight, marginBottom: "24px" }}>
-        Upload your photo to see how <strong>{product?.name}</strong> looks on you.
-      </p>
+      <div style={{ display: "flex", gap: "32px", flexWrap: "wrap" }}>
+        {/* Upload column */}
+        <div style={{ flex: "1 1 300px" }}>
+          <label style={{
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: "10px", padding: "32px 20px",
+            background: C.white, border: `2px dashed ${C.border}`,
+            borderRadius: "16px", cursor: "pointer",
+            transition: "border-color 0.2s",
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = C.navy; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; }}>
+            <div style={{ fontSize: "36px" }}>📷</div>
+            <div style={{ fontFamily: F.display, fontWeight: 700, color: C.navy, fontSize: "16px" }}>Upload Your Photo</div>
+            <div style={{ fontSize: "13px", color: C.textMuted, textAlign: "center", lineHeight: 1.6 }}>
+              Stand straight, plain background,<br />good lighting for best results.
+            </div>
+            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: "none" }} />
+          </label>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label style={{
-          display: 'inline-block', padding: '10px 20px',
-          background: C.primary, color: '#fff', cursor: 'pointer',
-          borderRadius: '8px', fontSize: "14px", fontWeight: 700,
-        }}>
-          📷 Upload Your Photo
-          <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
-        </label>
-      </div>
-
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
-        {userPhotoPreview && (
-          <div>
-            <p style={{ fontWeight: 700, marginBottom: "8px", color: C.text }}>Your Photo</p>
-            <img src={userPhotoPreview} alt="Your photo" style={{ width: '250px', borderRadius: '10px', border: `1px solid ${C.border}` }} />
-          </div>
-        )}
-        {product?.image && (
-          <div>
-            <p style={{ fontWeight: 700, marginBottom: "8px", color: C.text }}>Garment</p>
-            <img src={product.image} alt="Garment" style={{ width: '250px', borderRadius: '10px', border: `1px solid ${C.border}` }} />
-          </div>
-        )}
-      </div>
-
-      {userPhoto && (
-        <button onClick={handleTryOn} disabled={loading} style={{
-          padding: '12px 30px',
-          background: loading ? C.border : C.primary,
-          color: loading ? C.textMuted : '#fff',
-          border: 'none', borderRadius: '10px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          fontSize: '15px', fontWeight: 700,
-        }}>
-          {loading ? '⏳ Generating... (30-60s)' : '✨ Generate AI Try-On'}
-        </button>
-      )}
-
-      {error && (
-        <div style={{ marginTop: '10px', background: "#fdf0f0", padding: "14px 16px", borderRadius: "8px", border: "1px solid #f5c6cb" }}>
-          <div style={{ color: "#c0392b", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>⚠️ Try-On Unavailable</div>
-          <div style={{ color: "#666", fontSize: "13px", lineHeight: 1.6 }}>
-            The AI try-on service is temporarily busy. Please wait a few minutes and try again.
-          </div>
+          {userPhotoPreview && (
+            <div style={{ marginTop: "16px", borderRadius: "14px", overflow: "hidden", border: `1.5px solid ${C.border}` }}>
+              <img src={userPhotoPreview} alt="Your photo" style={{ width: "100%", display: "block" }} />
+            </div>
+          )}
         </div>
-      )}
 
-      {resultImage && (
-        <div style={{ marginTop: '30px' }}>
-          <h3 style={{ fontWeight: 800, color: C.text, marginBottom: "12px" }}>Result</h3>
-          <img src={resultImage} alt="Try-on result" style={{ width: '350px', borderRadius: '10px', display: 'block', border: `1px solid ${C.border}` }} />
-          <div style={{ marginTop: '16px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <a
-              href={resultImage}
-              download="tryon-result.jpg"
-              style={{
-                padding: '10px 20px', background: C.primary,
-                color: '#fff', borderRadius: '8px',
-                textDecoration: 'none', fontSize: '14px', fontWeight: 700,
-              }}
-            >
-              💾 Save Image
-            </a>
-            <button
-              onClick={() => onAddToCart && onAddToCart(product)}
-              style={{
-                padding: '10px 20px', background: C.success,
-                color: '#fff', border: 'none', borderRadius: '8px',
-                cursor: 'pointer', fontSize: '14px', fontWeight: 700,
-              }}
-            >
-              🛒 Add to Cart
+        {/* Garment + result column */}
+        <div style={{ flex: "1 1 300px" }}>
+          {product?.image && (
+            <div style={{ marginBottom: "16px" }}>
+              <div style={{ fontSize: "11px", fontWeight: 700, color: C.textMuted, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "8px" }}>Garment</div>
+              <div style={{ borderRadius: "14px", overflow: "hidden", border: `1.5px solid ${C.border}`, maxWidth: "280px" }}>
+                <img src={product.image} alt="Garment" style={{ width: "100%", display: "block" }} />
+              </div>
+            </div>
+          )}
+
+          {userPhoto && (
+            <button onClick={handleTryOn} disabled={loading} className="btn-primary" style={{
+              padding: "13px 32px", fontSize: "14px", fontWeight: 700,
+              borderRadius: "12px", marginBottom: "16px",
+              opacity: loading ? 0.7 : 1,
+            }}>
+              {loading ? "⏳ Generating… (30–60s)" : "✨ Generate AI Try-On"}
             </button>
-            <button
-              onClick={() => window.open(`https://wa.me/?text=Check%20out%20my%20virtual%20try-on!%20${encodeURIComponent(resultImage)}`, '_blank')}
-              style={{
-                padding: '10px 20px', background: C.green,
-                color: '#fff', border: 'none', borderRadius: '8px',
-                cursor: 'pointer', fontSize: '14px', fontWeight: 700,
-              }}
-            >
-              📱 Share on WhatsApp
-            </button>
-          </div>
-          <button onClick={onBack} style={{
-            marginTop: "20px", background: "none",
-            border: `1px solid ${C.border}`, borderRadius: "8px",
-            color: C.textLight, padding: "10px 20px",
-            cursor: "pointer", fontSize: "14px",
-          }}>← Back to Shopping</button>
+          )}
+
+          {error && (
+            <div style={{ background: "#fdf0f0", padding: "14px 16px", borderRadius: "12px", border: `1px solid #f5c6cb`, marginBottom: "16px" }}>
+              <div style={{ color: C.error, fontWeight: 700, fontSize: "13px", marginBottom: "4px" }}>⚠️ Try-On Unavailable</div>
+              <div style={{ color: C.textMid, fontSize: "13px", lineHeight: 1.6 }}>
+                The AI service is temporarily busy. Please wait a few minutes and try again.
+              </div>
+            </div>
+          )}
+
+          {resultImage && (
+            <div>
+              <div style={{ fontSize: "11px", fontWeight: 700, color: C.textMuted, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "8px" }}>Your Result</div>
+              <img src={resultImage} alt="Try-on result" style={{
+                width: "100%", maxWidth: "350px", borderRadius: "14px",
+                display: "block", border: `1.5px solid ${C.border}`,
+              }} />
+              <div style={{ marginTop: "16px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <a href={resultImage} download="tryon-result.jpg" className="btn-primary" style={{
+                  padding: "10px 20px", fontSize: "13px", fontWeight: 700,
+                  borderRadius: "10px", textDecoration: "none", display: "inline-block",
+                  background: C.navy, color: "#fff",
+                }}>💾 Save Image</a>
+                <button onClick={() => onAddToCart && onAddToCart(product)} className="btn-primary" style={{
+                  padding: "10px 20px", fontSize: "13px", fontWeight: 700,
+                  borderRadius: "10px", background: C.success,
+                }}>🛒 Add to Cart</button>
+                <button onClick={() => window.open(`https://wa.me/?text=Check%20out%20my%20virtual%20try-on!%20${encodeURIComponent(resultImage)}`, "_blank")}
+                  style={{
+                    padding: "10px 20px", background: C.green, color: "#fff",
+                    border: "none", borderRadius: "10px", cursor: "pointer",
+                    fontSize: "13px", fontWeight: 700, fontFamily: F.body,
+                  }}>📱 Share</button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </PageWrapper>
   );
 }
 
@@ -834,61 +1006,75 @@ function CartPage({ cart, setCart, onCheckout, onBack }) {
     setCart(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(0, i.qty + delta) } : i).filter(i => i.qty > 0));
 
   if (cart.length === 0) return (
-    <div style={{ textAlign: "center", padding: "80px 20px" }}>
-      <div style={{ fontSize: "64px" }}>🛒</div>
-      <h2 style={{ color: C.textMuted, marginTop: "16px" }}>Your cart is empty</h2>
-      <p style={{ color: C.textLight }}>Add some items from the shop!</p>
-      <button onClick={onBack} style={{
-        marginTop: "16px", padding: "10px 24px",
-        background: C.primary, border: "none", borderRadius: "10px",
-        color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer",
-      }}>← Back to Shop</button>
-    </div>
+    <PageWrapper>
+      <div style={{ textAlign: "center", padding: "80px 20px" }}>
+        <div style={{ fontSize: "64px", marginBottom: "20px" }}>🛒</div>
+        <h2 style={{ fontFamily: F.display, color: C.navy, marginBottom: "10px" }}>Your cart is empty</h2>
+        <p style={{ color: C.textLight, marginBottom: "24px" }}>Add some items from the shop!</p>
+        <button onClick={onBack} className="btn-primary" style={{ padding: "12px 28px", fontSize: "14px", fontWeight: 600, borderRadius: "10px" }}>← Back to Shop</button>
+      </div>
+    </PageWrapper>
   );
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <button onClick={onBack} style={{
-        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
-        color: C.textLight, padding: "8px 16px", cursor: "pointer",
-        marginBottom: "20px", fontSize: "14px",
-      }}>← Back</button>
+    <PageWrapper>
+      <BackBtn onClick={onBack} />
+      <PageTitle title={`Your Cart`} subtitle={`${cart.reduce((s,i)=>s+i.qty,0)} item${cart.reduce((s,i)=>s+i.qty,0)===1?"":'s'} ready for checkout`} />
 
-      <h2 style={{ fontSize: "28px", fontWeight: 900, margin: "0 0 24px", color: C.text }}>Your Cart ({cart.length})</h2>
-      {cart.map(item => (
-        <div key={item.id} style={{
-          display: "flex", alignItems: "center", gap: "16px",
-          background: C.bgCard, borderRadius: "14px", padding: "16px",
-          marginBottom: "12px", border: `1px solid ${C.border}`,
-        }}>
-          <div style={{ width: "60px", height: "60px", borderRadius: "10px", overflow: "hidden", flexShrink: 0 }}>
-            <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: "15px", color: C.text }}>{item.name}</div>
-            <div style={{ color: C.primary, fontWeight: 700 }}>{fmt(item.price)}</div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button onClick={() => updateQty(item.id, -1)} style={{ width: "28px", height: "28px", borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bgDark, color: C.text, cursor: "pointer", fontSize: "16px" }}>-</button>
-            <span style={{ fontWeight: 700, minWidth: "20px", textAlign: "center", color: C.text }}>{item.qty}</span>
-            <button onClick={() => updateQty(item.id, 1)} style={{ width: "28px", height: "28px", borderRadius: "50%", border: `1px solid ${C.border}`, background: C.bgDark, color: C.text, cursor: "pointer", fontSize: "16px" }}>+</button>
-          </div>
-          <div style={{ fontWeight: 900, color: C.text, minWidth: "80px", textAlign: "right" }}>{fmt(item.price * item.qty)}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr min(340px,100%)", gap: "28px", alignItems: "start" }}>
+        {/* Items */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {cart.map(item => (
+            <div key={item.id} style={{
+              display: "flex", alignItems: "center", gap: "16px",
+              background: C.white, borderRadius: "14px", padding: "16px",
+              border: `1.5px solid ${C.borderLight}`,
+              boxShadow: `0 2px 8px ${C.shadow}`,
+            }}>
+              <div style={{ width: "68px", height: "68px", borderRadius: "12px", overflow: "hidden", flexShrink: 0 }}>
+                <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: F.display, fontWeight: 700, fontSize: "15px", color: C.navy }}>{item.name}</div>
+                <div style={{ color: C.gold, fontWeight: 700, fontSize: "14px", marginTop: "2px" }}>{fmt(item.price)}</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                {["-","qty","+"].map((v,idx) => v === "qty"
+                  ? <span key="qty" style={{ fontWeight: 700, minWidth: "24px", textAlign: "center", color: C.navy, fontSize: "15px" }}>{item.qty}</span>
+                  : <button key={v} onClick={() => updateQty(item.id, v==="-"?-1:1)} style={{
+                      width: "30px", height: "30px", borderRadius: "8px",
+                      border: `1.5px solid ${C.border}`, background: C.creamDark,
+                      color: C.navy, cursor: "pointer", fontSize: "16px", fontWeight: 700,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>{v}</button>
+                )}
+              </div>
+              <div style={{ fontFamily: F.display, fontWeight: 700, color: C.navy, minWidth: "90px", textAlign: "right", fontSize: "15px" }}>{fmt(item.price * item.qty)}</div>
+            </div>
+          ))}
         </div>
-      ))}
-      <div style={{ background: C.bgCard, borderRadius: "14px", padding: "20px", border: `1px solid ${C.border}`, marginTop: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", color: C.textMuted, fontSize: "14px" }}><span>Subtotal</span><span>{fmt(total)}</span></div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", color: C.textMuted, fontSize: "14px" }}><span>Delivery</span><span style={{ color: C.success }}>Free</span></div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "20px", fontWeight: 900, borderTop: `1px solid ${C.border}`, paddingTop: "12px", marginBottom: "16px", color: C.text }}><span>Total</span><span style={{ color: C.primary }}>{fmt(total)}</span></div>
-        <button onClick={onCheckout} style={{ width: "100%", padding: "14px", background: C.primary, border: "none", borderRadius: "12px", color: "#fff", fontWeight: 900, fontSize: "16px", cursor: "pointer" }}>Proceed to Checkout →</button>
+
+        {/* Summary */}
+        <div style={{ background: C.white, borderRadius: "16px", padding: "24px", border: `1.5px solid ${C.borderLight}`, boxShadow: `0 2px 12px ${C.shadow}` }}>
+          <div style={{ fontFamily: F.display, fontWeight: 700, fontSize: "18px", color: C.navy, marginBottom: "20px" }}>Order Summary</div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", color: C.textMid, fontSize: "14px" }}><span>Subtotal</span><span>{fmt(total)}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", color: C.textMid, fontSize: "14px" }}><span>Delivery</span><span style={{ color: C.success, fontWeight: 600 }}>Free</span></div>
+          <GoldDivider style={{ marginBottom: "16px" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontFamily: F.display, fontSize: "20px", fontWeight: 700, color: C.navy, marginBottom: "20px" }}>
+            <span>Total</span><span>{fmt(total)}</span>
+          </div>
+          <button onClick={onCheckout} className="btn-primary" style={{ width: "100%", padding: "14px", fontSize: "15px", fontWeight: 700, borderRadius: "12px" }}>
+            Proceed to Checkout →
+          </button>
+        </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 
 // ─── Checkout Page ────────────────────────────────────────────────────────────
 function CheckoutPage({ cart, user, onSuccess, onBack }) {
-  const [form, setForm] = useState({ name: user?.name || "", email: user?.email || "", phone: "", address: "" });
+  const [form, setForm] = useState({ name: user?.name||"", email: user?.email||"", phone: "", address: "" });
   const [payment, setPayment] = useState("card");
   const [card, setCard] = useState({ number: "", expiry: "", cvv: "" });
   const [processing, setProcessing] = useState(false);
@@ -902,12 +1088,8 @@ function CheckoutPage({ cart, user, onSuccess, onBack }) {
         await addDoc(collection(db, "orders"), {
           userId: user.uid,
           items: cart.map(i => ({ name: i.name, price: i.price, qty: i.qty })),
-          total,
-          address: form.address,
-          phone: form.phone,
-          email: form.email,
-          payment,
-          createdAt: serverTimestamp(),
+          total, address: form.address, phone: form.phone,
+          email: form.email, payment, createdAt: serverTimestamp(),
         });
       }
       const itemList = cart.map(i => `• ${i.name} x${i.qty} — ${fmt(i.price * i.qty)}`).join("\n");
@@ -919,190 +1101,181 @@ function CheckoutPage({ cart, user, onSuccess, onBack }) {
     onSuccess();
   };
 
-  const inp = {
-    width: "100%", padding: "10px 14px", borderRadius: "10px",
-    border: `1px solid ${C.border}`, background: C.bgCard, color: C.text,
-    fontSize: "14px", boxSizing: "border-box", outline: "none",
-  };
-
   return (
-    <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-      <button onClick={onBack} style={{
-        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
-        color: C.textLight, padding: "8px 16px", cursor: "pointer",
-        marginBottom: "20px", fontSize: "14px",
-      }}>← Back to Cart</button>
+    <PageWrapper style={{ maxWidth: "680px" }}>
+      <BackBtn onClick={onBack} label="← Back to Cart" />
+      <PageTitle title="Checkout" subtitle="Complete your order below." />
 
-      <h2 style={{ fontSize: "28px", fontWeight: 900, margin: "0 0 24px", color: C.text }}>Checkout</h2>
-      <div style={{ background: C.bgCard, borderRadius: "14px", padding: "20px", border: `1px solid ${C.border}`, marginBottom: "16px" }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: C.primary }}>📦 Delivery Information</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <input placeholder="Full Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={inp} />
-          <input placeholder="Email Address" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={inp} />
-          <input placeholder="Phone Number" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={inp} />
-          <input placeholder="Delivery Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={inp} />
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        {/* Delivery */}
+        <div style={{ background: C.white, borderRadius: "16px", padding: "24px", border: `1.5px solid ${C.borderLight}` }}>
+          <div style={{ fontFamily: F.display, fontWeight: 700, fontSize: "16px", color: C.navy, marginBottom: "18px" }}>📦 Delivery Information</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <input placeholder="Full Name" value={form.name} onChange={e => setForm({...form,name:e.target.value})} style={INP} />
+            <input placeholder="Email Address" value={form.email} onChange={e => setForm({...form,email:e.target.value})} style={INP} />
+            <input placeholder="Phone Number" value={form.phone} onChange={e => setForm({...form,phone:e.target.value})} style={INP} />
+            <input placeholder="Delivery Address" value={form.address} onChange={e => setForm({...form,address:e.target.value})} style={INP} />
+          </div>
         </div>
-      </div>
-      <div style={{ background: C.bgCard, borderRadius: "14px", padding: "20px", border: `1px solid ${C.border}`, marginBottom: "16px" }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: C.primary }}>💳 Payment Method</h3>
-        <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
-          {[["card", "💳 Card"], ["transfer", "🏦 Transfer"], ["cod", "💵 Cash on Delivery"]].map(([val, label]) => (
-            <button key={val} onClick={() => setPayment(val)} style={{
-              flex: 1, padding: "10px", borderRadius: "10px",
-              border: payment === val ? `2px solid ${C.primary}` : `1px solid ${C.border}`,
-              background: payment === val ? `${C.primary}15` : C.bgDark,
-              color: payment === val ? C.primary : C.textMuted,
-              cursor: "pointer", fontSize: "12px", fontWeight: payment === val ? 700 : 400,
-            }}>{label}</button>
-          ))}
-        </div>
-        {payment === "card" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <input placeholder="Card Number" value={card.number} onChange={e => setCard({ ...card, number: e.target.value })} style={inp} />
-            <div style={{ display: "flex", gap: "10px" }}>
-              <input placeholder="MM/YY" value={card.expiry} onChange={e => setCard({ ...card, expiry: e.target.value })} style={{ ...inp, flex: 1 }} />
-              <input placeholder="CVV" value={card.cvv} onChange={e => setCard({ ...card, cvv: e.target.value })} style={{ ...inp, flex: 1 }} />
+
+        {/* Payment */}
+        <div style={{ background: C.white, borderRadius: "16px", padding: "24px", border: `1.5px solid ${C.borderLight}` }}>
+          <div style={{ fontFamily: F.display, fontWeight: 700, fontSize: "16px", color: C.navy, marginBottom: "18px" }}>💳 Payment Method</div>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
+            {[["card","💳 Card"],["transfer","🏦 Transfer"],["cod","💵 Cash on Delivery"]].map(([val,label]) => (
+              <button key={val} onClick={() => setPayment(val)} style={{
+                flex: 1, padding: "11px", borderRadius: "10px",
+                border: payment===val ? `2px solid ${C.navy}` : `1.5px solid ${C.border}`,
+                background: payment===val ? `rgba(15,31,69,0.06)` : C.white,
+                color: payment===val ? C.navy : C.textMid,
+                cursor: "pointer", fontSize: "13px", fontWeight: payment===val ? 700 : 500,
+                fontFamily: F.body, transition: "all 0.2s",
+              }}>{label}</button>
+            ))}
+          </div>
+          {payment === "card" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <input placeholder="Card Number" value={card.number} onChange={e => setCard({...card,number:e.target.value})} style={INP} />
+              <div style={{ display: "flex", gap: "10px" }}>
+                <input placeholder="MM/YY" value={card.expiry} onChange={e => setCard({...card,expiry:e.target.value})} style={{ ...INP, flex:1 }} />
+                <input placeholder="CVV" value={card.cvv} onChange={e => setCard({...card,cvv:e.target.value})} style={{ ...INP, flex:1 }} />
+              </div>
             </div>
+          )}
+          {payment === "transfer" && (
+            <div style={{ background: C.creamDark, borderRadius: "10px", padding: "16px", fontSize: "13px", color: C.textMid, lineHeight: 2 }}>
+              <strong style={{ color: C.navy }}>Bank Transfer Details:</strong><br />
+              Bank: GTBank &nbsp;·&nbsp; Account: 0123456789<br />
+              Name: TechFit Ltd &nbsp;·&nbsp; Amount: {fmt(total)}
+            </div>
+          )}
+          {payment === "cod" && (
+            <div style={{ background: C.creamDark, borderRadius: "10px", padding: "16px", fontSize: "13px", color: C.textMid }}>
+              Pay {fmt(total)} when your order arrives. Available within Lagos only.
+            </div>
+          )}
+        </div>
+
+        {/* Total */}
+        <div style={{ background: C.white, borderRadius: "16px", padding: "20px", border: `1.5px solid ${C.borderLight}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", color: C.textMid, fontSize: "14px", marginBottom: "8px" }}><span>Subtotal</span><span>{fmt(total)}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between", color: C.textMid, fontSize: "14px", marginBottom: "14px" }}><span>Delivery</span><span style={{ color: C.success, fontWeight: 600 }}>Free</span></div>
+          <GoldDivider style={{ marginBottom: "14px" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontFamily: F.display, fontSize: "20px", fontWeight: 700, color: C.navy }}>
+            <span>Total</span><span>{fmt(total)}</span>
           </div>
-        )}
-        {payment === "transfer" && (
-          <div style={{ background: C.bgDark, borderRadius: "10px", padding: "16px", fontSize: "13px", color: C.textLight, lineHeight: 2 }}>
-            <strong style={{ color: C.text }}>Bank Transfer Details:</strong><br />
-            Bank: GTBank | Account: 0123456789<br />
-            Name: TechFit Ltd | Amount: {fmt(total)}
-          </div>
-        )}
-        {payment === "cod" && (
-          <div style={{ background: C.bgDark, borderRadius: "10px", padding: "16px", fontSize: "13px", color: C.textLight }}>
-            Pay {fmt(total)} when your order arrives. Available within Lagos only.
-          </div>
-        )}
+        </div>
+
+        <p style={{ fontSize: "12px", color: C.textMuted, textAlign: "center" }}>📱 A WhatsApp receipt will be sent after your order is placed.</p>
+        <button onClick={handleSubmit} disabled={processing} className="btn-primary" style={{
+          width: "100%", padding: "15px", fontSize: "16px", fontWeight: 700,
+          borderRadius: "12px", opacity: processing ? 0.7 : 1,
+        }}>
+          {processing ? "Processing Payment… ⏳" : `Place Order · ${fmt(total)}`}
+        </button>
       </div>
-      <div style={{ background: C.bgCard, borderRadius: "14px", padding: "16px", border: `1px solid ${C.border}`, marginBottom: "16px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", color: C.textMuted, fontSize: "14px", marginBottom: "8px" }}><span>Subtotal</span><span>{fmt(total)}</span></div>
-        <div style={{ display: "flex", justifyContent: "space-between", color: C.textMuted, fontSize: "14px", marginBottom: "8px" }}><span>Delivery</span><span style={{ color: C.success }}>Free</span></div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: "18px", borderTop: `1px solid ${C.border}`, paddingTop: "8px", color: C.text }}><span>Total</span><span style={{ color: C.primary }}>{fmt(total)}</span></div>
-      </div>
-      <p style={{ fontSize: "12px", color: C.textMuted, textAlign: "center", marginBottom: "8px" }}>📱 WhatsApp receipt will be sent automatically after order</p>
-      <button onClick={handleSubmit} disabled={processing} style={{
-        width: "100%", padding: "15px",
-        background: processing ? C.border : C.primary,
-        border: "none", borderRadius: "12px",
-        color: processing ? C.textMuted : "#fff",
-        fontWeight: 900, fontSize: "16px",
-        cursor: processing ? "wait" : "pointer",
-      }}>
-        {processing ? "Processing Payment... ⏳" : `Place Order · ${fmt(total)}`}
-      </button>
-    </div>
+    </PageWrapper>
   );
 }
 
 // ─── Success Page ─────────────────────────────────────────────────────────────
 function SuccessPage({ onHome }) {
   return (
-    <div style={{ textAlign: "center", padding: "80px 20px" }}>
-      <div style={{ fontSize: "72px" }}>🎉</div>
-      <h2 style={{ fontSize: "32px", fontWeight: 900, margin: "16px 0 8px", color: C.text }}>Order Placed!</h2>
-      <p style={{ color: C.textLight, maxWidth: "400px", margin: "0 auto 32px", lineHeight: 1.7 }}>
-        Thank you for shopping with TechFit! Your order has been confirmed.<br />
-        A WhatsApp receipt has been sent to you.
-      </p>
-      <button onClick={onHome} style={{
-        padding: "14px 36px", background: C.primary, border: "none",
-        borderRadius: "14px", color: "#fff", fontWeight: 800,
-        fontSize: "16px", cursor: "pointer",
-      }}>Continue Shopping 🛍️</button>
-    </div>
+    <PageWrapper>
+      <div className="fade-up" style={{ textAlign: "center", padding: "80px 20px", maxWidth: "460px", margin: "0 auto" }}>
+        <div style={{
+          width: "88px", height: "88px", borderRadius: "50%",
+          background: `linear-gradient(135deg, ${C.success}, #15b87a)`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: "40px", margin: "0 auto 24px",
+          boxShadow: `0 12px 30px rgba(26,158,95,0.3)`,
+        }}>🎉</div>
+        <h2 style={{ fontFamily: F.display, fontSize: "36px", fontWeight: 700, color: C.navy, margin: "0 0 12px" }}>Order Placed!</h2>
+        <GoldDivider style={{ margin: "0 auto 20px", maxWidth: "120px" }} />
+        <p style={{ color: C.textMid, lineHeight: 1.8, marginBottom: "32px", fontSize: "15px" }}>
+          Thank you for shopping with TechFit. Your order has been confirmed and a WhatsApp receipt has been sent to you.
+        </p>
+        <button onClick={onHome} className="btn-primary" style={{ padding: "14px 40px", fontSize: "15px", fontWeight: 700, borderRadius: "12px" }}>
+          Continue Shopping
+        </button>
+      </div>
+    </PageWrapper>
   );
 }
 
 // ─── Help Page ────────────────────────────────────────────────────────────────
 function HelpPage({ onBack }) {
+  const [open, setOpen] = useState(null);
   const sections = [
-    {
-      title: "Getting Started",
-      items: [
-        { q: "How do I create an account?", a: "Tap Sign Up on the login page, enter your name, email and password (min 6 characters), then tap Create Account." },
-        { q: "How do I sign in?", a: "Enter your email and password on the login page and tap Sign In." },
-        { q: "I forgot my password", a: "Enter your email on the login page, tap Forgot Password, then check your email for a reset link." },
-        { q: "Can I use the app without an account?", a: "Yes, tap Continue as Guest. Note that guests cannot view order history." },
-      ]
-    },
-    {
-      title: "Shopping",
-      items: [
-        { q: "How do I find a product?", a: "Go to Shop and use the search bar or category buttons to filter products." },
-        { q: "How do I add to cart?", a: "Tap Add to Cart on any product card. The cart count in the top bar updates automatically." },
-        { q: "How do I share a product?", a: "Tap the green phone icon on any product card to share it on WhatsApp." },
-      ]
-    },
-    {
-      title: "Virtual Try-On",
-      items: [
-        { q: "How do I try on a garment?", a: "Tap Try On on any product, upload your photo, then tap Generate AI Try-On. Results take 30-60 seconds." },
-        { q: "How do I get the best try-on result?", a: "Use a clear photo standing straight with a plain background and good lighting, facing the camera directly." },
-        { q: "How do I save my try-on result?", a: "Tap Save Image after the result appears to download it to your device." },
-        { q: "The try-on failed. What do I do?", a: "Wait 5 minutes and try again. The AI has a usage limit that resets every hour." },
-      ]
-    },
-    {
-      title: "Checkout & Orders",
-      items: [
-        { q: "What payment methods are accepted?", a: "Card payment, Bank Transfer (GTBank), and Cash on Delivery (Lagos only)." },
-        { q: "How do I track my order?", a: "Tap Orders in the navigation bar to see all your past orders." },
-        { q: "Will I get a receipt?", a: "Yes, a WhatsApp receipt is generated automatically after every order." },
-      ]
-    },
-    {
-      title: "Troubleshooting",
-      items: [
-        { q: "The site is slow to load", a: "Wait 30-60 seconds on first visit. The server wakes up when you visit." },
-        { q: "Images are not showing", a: "Check your internet connection and refresh the page." },
-        { q: "My cart is empty after logging in", a: "The cart resets when you log out. Add your items again after signing in." },
-      ]
-    },
+    { title: "Getting Started", items: [
+      { q: "How do I create an account?", a: "Tap Sign Up on the login page, enter your name, email and password (min 6 characters), then tap Create Account." },
+      { q: "I forgot my password", a: "Enter your email on the login page, tap Forgot Password, then check your email for a reset link." },
+      { q: "Can I use the app without an account?", a: "Yes, tap Continue as Guest. Note that guests cannot view order history." },
+    ]},
+    { title: "Shopping", items: [
+      { q: "How do I find a product?", a: "Go to Shop and use the search bar or category buttons to filter products." },
+      { q: "How do I add to cart?", a: "Tap Add to Cart on any product card. The cart count in the top bar updates automatically." },
+      { q: "How do I share a product?", a: "Tap the green phone icon on any product card to share it on WhatsApp." },
+    ]},
+    { title: "Virtual Try-On", items: [
+      { q: "How do I try on a garment?", a: "Tap Try On on any product, upload your photo, then tap Generate AI Try-On. Results take 30-60 seconds." },
+      { q: "How do I get the best result?", a: "Use a clear photo standing straight with a plain background and good lighting, facing the camera directly." },
+      { q: "The try-on failed. What do I do?", a: "Wait 5 minutes and try again. The AI has a usage limit that resets every hour." },
+    ]},
+    { title: "Checkout & Orders", items: [
+      { q: "What payment methods are accepted?", a: "Card payment, Bank Transfer (GTBank), and Cash on Delivery (Lagos only)." },
+      { q: "How do I track my order?", a: "Tap Orders in the navigation bar to see all your past orders." },
+      { q: "Will I get a receipt?", a: "Yes, a WhatsApp receipt is generated automatically after every order." },
+    ]},
   ];
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <button onClick={onBack} style={{
-        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
-        color: C.textLight, padding: "8px 16px", cursor: "pointer",
-        marginBottom: "20px", fontSize: "14px",
-      }}>← Back</button>
-
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: C.primary, marginBottom: "8px" }}>User Guide</h2>
-      <p style={{ color: C.textMuted, marginBottom: "30px" }}>Everything you need to know about using TechFit.</p>
+    <PageWrapper>
+      <BackBtn onClick={onBack} />
+      <PageTitle title="User Guide" subtitle="Everything you need to know about TechFit." />
 
       {sections.map(section => (
-        <div key={section.title} style={{ marginBottom: "30px" }}>
+        <div key={section.title} style={{ marginBottom: "32px" }}>
           <h3 style={{
-            fontSize: "18px", fontWeight: 800, color: C.primary,
-            borderBottom: `2px solid ${C.accent}`, paddingBottom: "8px", marginBottom: "16px"
+            fontFamily: F.display, fontSize: "18px", fontWeight: 700,
+            color: C.navy, marginBottom: "14px",
+            paddingBottom: "10px", borderBottom: `2px solid ${C.gold}`,
           }}>{section.title}</h3>
-          {section.items.map(item => (
-            <div key={item.q} style={{
-              background: C.bgCard, borderRadius: "10px", padding: "16px",
-              marginBottom: "10px", border: `1px solid ${C.border}`
-            }}>
-              <div style={{ fontWeight: 700, color: C.text, marginBottom: "6px", fontSize: "14px" }}>{item.q}</div>
-              <div style={{ color: C.textLight, fontSize: "13px", lineHeight: 1.6 }}>{item.a}</div>
-            </div>
-          ))}
+          {section.items.map((item, i) => {
+            const key = `${section.title}-${i}`;
+            const isOpen = open === key;
+            return (
+              <div key={key} style={{
+                background: C.white, borderRadius: "12px", marginBottom: "8px",
+                border: `1.5px solid ${isOpen ? C.navy : C.borderLight}`,
+                overflow: "hidden", transition: "border-color 0.2s",
+              }}>
+                <button onClick={() => setOpen(isOpen ? null : key)} style={{
+                  width: "100%", display: "flex", justifyContent: "space-between",
+                  alignItems: "center", padding: "16px 18px",
+                  background: "none", border: "none", cursor: "pointer",
+                  fontFamily: F.body, fontWeight: 600, color: C.navy,
+                  fontSize: "14px", textAlign: "left", gap: "12px",
+                }}>
+                  <span>{item.q}</span>
+                  <span style={{ color: C.gold, fontSize: "18px", flexShrink: 0, transition: "transform 0.2s", transform: isOpen?"rotate(180deg)":"rotate(0deg)" }}>▾</span>
+                </button>
+                {isOpen && (
+                  <div style={{ padding: "0 18px 16px", color: C.textMid, fontSize: "13px", lineHeight: 1.75, borderTop: `1px solid ${C.borderLight}`, marginTop: "0", paddingTop: "14px" }}>
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       ))}
 
-      <div style={{
-        background: C.primary, borderRadius: "12px", padding: "20px",
-        textAlign: "center", marginTop: "20px"
-      }}>
-        <div style={{ color: "#fff", fontWeight: 700, marginBottom: "4px" }}>Need more help?</div>
-        <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px" }}>
-          Contact Apex Software Corp. · University of Ilorin
-        </div>
+      <div style={{ background: `linear-gradient(135deg, ${C.navy}, ${C.navyLight})`, borderRadius: "16px", padding: "28px 24px", textAlign: "center" }}>
+        <div style={{ fontFamily: F.display, color: "#fff", fontWeight: 700, fontSize: "18px", marginBottom: "6px" }}>Need more help?</div>
+        <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "13px" }}>Contact Apex Software Corp. · University of Ilorin</div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 
@@ -1111,7 +1284,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [page, setPage] = useState("home");
-  const [pageHistory, setPageHistory] = useState([]);  // ← history stack
+  const [pageHistory, setPageHistory] = useState([]);
   const [cart, setCart] = useState([]);
   const [tryOnProduct, setTryOnProduct] = useState(null);
   const [toast, setToast] = useState(null);
@@ -1121,149 +1294,144 @@ export default function App() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // ── Navigate to a new page, pushing current page onto history stack ────────
-  const navigate = (newPage) => {
-    setPageHistory(prev => [...prev, page]);
-    setPage(newPage);
-  };
-
-  // ── Go back to the previous page in history ────────────────────────────────
+  const navigate = (newPage) => { setPageHistory(prev => [...prev, page]); setPage(newPage); };
   const goBack = () => {
     if (pageHistory.length === 0) return;
-    const prev = pageHistory[pageHistory.length - 1];
+    setPage(pageHistory[pageHistory.length - 1]);
     setPageHistory(h => h.slice(0, -1));
-    setPage(prev);
   };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        setUser({
-          name: firebaseUser.displayName || firebaseUser.email.split("@")[0],
-          email: firebaseUser.email,
-          uid: firebaseUser.uid,
-        });
-      } else {
-        setUser(null);
-      }
+        setUser({ name: firebaseUser.displayName||firebaseUser.email.split("@")[0], email: firebaseUser.email, uid: firebaseUser.uid });
+      } else { setUser(null); }
       setAuthLoading(false);
     });
     return () => unsub();
   }, []);
 
-  const handleLogin = (u) => {
-    setUser(u);
-    setPage("home");
-    setPageHistory([]);
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    setUser(null);
-    setCart([]);
-    setPage("home");
-    setPageHistory([]);
-  };
-
-  const handleTryOn = (product) => {
-    setTryOnProduct(product);
-    navigate("tryon");
-  };
-
-  const handleSuccess = () => {
-    setCart([]);
-    // Clear history and go to success — back from success goes to shop
-    setPageHistory(["shop"]);
-    setPage("success");
-  };
-
+  const handleLogin = (u) => { setUser(u); setPage("home"); setPageHistory([]); };
+  const handleLogout = async () => { await signOut(auth); setUser(null); setCart([]); setPage("home"); setPageHistory([]); };
+  const handleTryOn = (product) => { setTryOnProduct(product); navigate("tryon"); };
+  const handleSuccess = () => { setCart([]); setPageHistory(["shop"]); setPage("success"); };
   const addToCart = (product) => {
-    setCart(prev => {
-      const e = prev.find(i => i.id === product.id);
-      if (e) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { ...product, qty: 1 }];
-    });
+    setCart(prev => { const e=prev.find(i=>i.id===product.id); if(e) return prev.map(i=>i.id===product.id?{...i,qty:i.qty+1}:i); return [...prev,{...product,qty:1}]; });
     showToast(`${product.name} added to cart!`);
   };
 
   if (authLoading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: C.primary }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: C.navy, fontFamily: F.body }}>
       <div style={{ textAlign: "center", color: "#fff" }}>
-        <div style={{ fontSize: "48px", marginBottom: "16px" }}>👗</div>
-        <div style={{ fontSize: "18px", fontWeight: 700 }}>Loading TechFit...</div>
+        <div style={{ fontFamily: F.display, fontSize: "42px", fontWeight: 900, marginBottom: "8px" }}>Tech<span style={{ color: C.gold }}>Fit</span></div>
+        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>Loading…</div>
       </div>
     </div>
   );
 
-  if (!user) return <LoginPage onLogin={handleLogin} />;
+  if (!user) return <><InjectStyles /><LoginPage onLogin={handleLogin} /></>;
+
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: C.cream, color: C.text, fontFamily: F.body }}>
+      <InjectStyles />
       {toast && <Toast msg={toast.msg} type={toast.type} />}
 
       {/* ── Navbar ── */}
       <nav style={{
-        background: C.primary, padding: "0 24px",
+        background: C.navy,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: "62px", boxShadow: "0 4px 16px rgba(26,47,94,0.3)",
+        height: "64px", padding: "0 28px",
+        boxShadow: `0 4px 20px rgba(0,0,0,0.25)`,
         position: "sticky", top: 0, zIndex: 100,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* ── Back arrow: only show when there's history ── */}
+        {/* Left: back + logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           {pageHistory.length > 0 && (
             <button onClick={goBack} style={{
-              background: "rgba(255,255,255,0.15)", border: "none",
+              background: "rgba(255,255,255,0.1)", border: "none",
               borderRadius: "8px", color: "#fff", cursor: "pointer",
-              padding: "6px 12px", fontSize: "18px",
-            }}>←</button>
+              padding: "6px 12px", fontSize: "16px", fontFamily: F.body,
+              transition: "background 0.2s",
+            }}
+              onMouseEnter={e => (e.target.style.background="rgba(255,255,255,0.18)")}
+              onMouseLeave={e => (e.target.style.background="rgba(255,255,255,0.1)")}
+            >←</button>
           )}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
-            onClick={() => { setPageHistory(prev => [...prev, page]); setPage("home"); }}>
-            <img
-              src="/unilorin-logo.png"
-              height="36"
-              alt="Unilorin Logo"
-              onError={e => (e.target.style.display = "none")}
-              style={{ borderRadius: "4px" }}
-            />
-            <span style={{ fontSize: "20px", fontWeight: 900, color: "#fff" }}>TechFit</span>
+            onClick={() => navigate("home")}>
+            <img src="/unilorin-logo.png" height="34" alt="" onError={e => (e.target.style.display="none")} style={{ borderRadius: "6px" }} />
+            <span style={{ fontFamily: F.display, fontSize: "20px", fontWeight: 700, color: "#fff", letterSpacing: "-0.3px" }}>
+              Tech<span style={{ color: C.gold }}>Fit</span>
+            </span>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "4px", alignItems: "center", flexWrap: "wrap" }}>
-          {[
-            ["home", "Home"],
-            ["shop", "Shop"],
-            ["cart", `Cart${cart.length > 0 ? ` (${cart.reduce((s, i) => s + i.qty, 0)})` : ""}`],
-          ].map(([id, label]) => (
+        {/* Right: nav links */}
+        <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
+          {[["home","Home"],["shop","Shop"]].map(([id,label]) => (
             <button key={id} onClick={() => navigate(id)} style={{
               padding: "8px 14px", borderRadius: "8px", border: "none",
-              background: page === id ? "rgba(255,255,255,0.2)" : "transparent",
-              color: "#fff", cursor: "pointer",
-              fontWeight: page === id ? 700 : 400, fontSize: "14px",
+              background: page===id ? "rgba(255,255,255,0.15)" : "transparent",
+              color: page===id ? "#fff" : "rgba(255,255,255,0.65)",
+              cursor: "pointer", fontWeight: page===id ? 600 : 400,
+              fontSize: "14px", fontFamily: F.body, transition: "all 0.2s",
             }}>{label}</button>
           ))}
+
+          {/* Cart with badge */}
+          <button onClick={() => navigate("cart")} style={{
+            padding: "8px 14px", borderRadius: "8px", border: "none",
+            background: page==="cart" ? "rgba(255,255,255,0.15)" : "transparent",
+            color: page==="cart" ? "#fff" : "rgba(255,255,255,0.65)",
+            cursor: "pointer", fontWeight: page==="cart" ? 600 : 400,
+            fontSize: "14px", fontFamily: F.body, position: "relative",
+            transition: "all 0.2s",
+          }}>
+            Cart
+            {cartCount > 0 && (
+              <span style={{
+                position: "absolute", top: "2px", right: "2px",
+                background: C.gold, color: C.navy,
+                borderRadius: "50%", width: "18px", height: "18px",
+                fontSize: "10px", fontWeight: 800,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>{cartCount}</span>
+            )}
+          </button>
+
           {user.uid !== "guest" && (
             <button onClick={() => navigate("orders")} style={{
               padding: "8px 14px", borderRadius: "8px", border: "none",
-              background: page === "orders" ? "rgba(255,255,255,0.2)" : "transparent",
-              color: "#fff", cursor: "pointer", fontSize: "14px",
-              fontWeight: page === "orders" ? 700 : 400,
+              background: page==="orders" ? "rgba(255,255,255,0.15)" : "transparent",
+              color: page==="orders" ? "#fff" : "rgba(255,255,255,0.65)",
+              cursor: "pointer", fontSize: "14px", fontFamily: F.body, fontWeight: page==="orders"?600:400,
+              transition: "all 0.2s",
             }}>Orders</button>
           )}
           <button onClick={() => navigate("help")} style={{
             padding: "8px 14px", borderRadius: "8px", border: "none",
-            background: page === "help" ? "rgba(255,255,255,0.2)" : "transparent",
-            color: "#fff", cursor: "pointer", fontSize: "14px",
-            fontWeight: page === "help" ? 700 : 400,
+            background: page==="help" ? "rgba(255,255,255,0.15)" : "transparent",
+            color: page==="help" ? "#fff" : "rgba(255,255,255,0.65)",
+            cursor: "pointer", fontSize: "14px", fontFamily: F.body, fontWeight: page==="help"?600:400,
+            transition: "all 0.2s",
           }}>Help</button>
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", marginLeft: "4px" }}>Hi, {user.name}!</span>
+
+          {/* Divider */}
+          <div style={{ width: "1px", height: "20px", background: "rgba(255,255,255,0.15)", margin: "0 6px" }} />
+
+          <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "13px" }}>Hi, {user.name}!</span>
           <button onClick={handleLogout} style={{
-            padding: "6px 12px", borderRadius: "8px",
-            border: "1px solid rgba(255,255,255,0.3)",
-            background: "transparent", color: "#fff",
-            cursor: "pointer", fontSize: "12px", marginLeft: "4px",
-          }}>Logout</button>
+            padding: "7px 14px", borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.2)",
+            background: "transparent", color: "rgba(255,255,255,0.75)",
+            cursor: "pointer", fontSize: "13px", fontFamily: F.body,
+            marginLeft: "4px", transition: "all 0.2s",
+          }}
+            onMouseEnter={e => { e.target.style.borderColor="rgba(255,255,255,0.5)"; e.target.style.color="#fff"; }}
+            onMouseLeave={e => { e.target.style.borderColor="rgba(255,255,255,0.2)"; e.target.style.color="rgba(255,255,255,0.75)"; }}
+          >Logout</button>
         </div>
       </nav>
 
@@ -1278,17 +1446,26 @@ export default function App() {
 
       {/* ── Footer ── */}
       <footer style={{
-        background: C.primary, color: "rgba(255,255,255,0.6)",
-        textAlign: "center", padding: "20px", fontSize: "13px", marginTop: "40px",
+        background: C.navy,
+        borderTop: `3px solid ${C.gold}`,
+        padding: "32px 28px",
+        marginTop: "60px",
       }}>
-        © 2025 TechFit · University of Ilorin · Built by Apex Software corp.
-        <span style={{ margin: "0 10px" }}>·</span>
-        <span
-          onClick={() => navigate("help")}
-          style={{ color: "rgba(255,255,255,0.8)", cursor: "pointer", textDecoration: "underline" }}
-        >
-          User Guide
-        </span>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+          <div>
+            <div style={{ fontFamily: F.display, fontSize: "18px", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>
+              Tech<span style={{ color: C.gold }}>Fit</span>
+            </div>
+            <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "12px" }}>University of Ilorin · Built by Apex Software Corp.</div>
+          </div>
+          <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+            <span onClick={() => navigate("help")} style={{ color: "rgba(255,255,255,0.55)", cursor: "pointer", fontSize: "13px", textDecoration: "underline", transition: "color 0.2s" }}
+              onMouseEnter={e=>(e.target.style.color="#fff")} onMouseLeave={e=>(e.target.style.color="rgba(255,255,255,0.55)")}>
+              User Guide
+            </span>
+            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "12px" }}>© 2025 TechFit</span>
+          </div>
+        </div>
       </footer>
     </div>
   );

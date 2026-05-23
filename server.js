@@ -58,7 +58,7 @@ hf_token: process.env.HF_TOKEN      });
   res.status(500).json({ success: false, error: lastError?.message || 'All retries failed' });
 });
 app.use(express.static(path.join(__dirname, 'dist')));
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 app.listen(3001, () => console.log('Try-on server running on port 3001'));

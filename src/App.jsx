@@ -1107,55 +1107,69 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Segoe UI', sans-serif" }}>
       {toast && <Toast msg={toast.msg} type={toast.type} />}
 
-      {/* Navbar */}
-      <nav style={{
-        background: C.primary, padding: "0 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: "62px", boxShadow: "0 4px 16px rgba(26,47,94,0.3)",
-        position: "sticky", top: 0, zIndex: 100,
-      }}>
-        {/* Brand: logo + name inline, clean */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => setPage("home")}>
-          <img
-            src="/unilorin-logo.png"
-            height="36"
-            alt="Unilorin Logo"
-            onError={e => (e.target.style.display = "none")}
-            style={{ borderRadius: "4px" }}
-          />
-          <span style={{ fontSize: "20px", fontWeight: 900, color: "#fff" }}>TechFit</span>
-        </div>
+     {/* Navbar */}
+<nav style={{
+  background: C.primary, padding: "0 24px",
+  display: "flex", alignItems: "center", justifyContent: "space-between",
+  height: "62px", boxShadow: "0 4px 16px rgba(26,47,94,0.3)",
+  position: "sticky", top: 0, zIndex: 100,
+}}>
+  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    {page !== "home" && (
+      <button onClick={() => setPage("home")} style={{
+        background: "rgba(255,255,255,0.15)", border: "none",
+        borderRadius: "8px", color: "#fff", cursor: "pointer",
+        padding: "6px 12px", fontSize: "18px",
+      }}>←</button>
+    )}
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => setPage("home")}>
+      <img
+        src="/unilorin-logo.png"
+        height="36"
+        alt="Unilorin Logo"
+        onError={e => (e.target.style.display = "none")}
+        style={{ borderRadius: "4px" }}
+      />
+      <span style={{ fontSize: "20px", fontWeight: 900, color: "#fff" }}>TechFit</span>
+    </div>
+  </div>
 
-        <div style={{ display: "flex", gap: "4px", alignItems: "center", flexWrap: "wrap" }}>
-          {[
-            ["home", "Home"],
-            ["shop", "Shop"],
-            ["cart", `Cart${cart.length > 0 ? ` (${cart.reduce((s, i) => s + i.qty, 0)})` : ""}`],
-          ].map(([id, label]) => (
-            <button key={id} onClick={() => setPage(id)} style={{
-              padding: "8px 14px", borderRadius: "8px", border: "none",
-              background: page === id ? "rgba(255,255,255,0.2)" : "transparent",
-              color: "#fff", cursor: "pointer",
-              fontWeight: page === id ? 700 : 400, fontSize: "14px",
-            }}>{label}</button>
-          ))}
-          {user.uid !== "guest" && (
-            <button onClick={() => setPage("orders")} style={{
-              padding: "8px 14px", borderRadius: "8px", border: "none",
-              background: page === "orders" ? "rgba(255,255,255,0.2)" : "transparent",
-              color: "#fff", cursor: "pointer", fontSize: "14px",
-              fontWeight: page === "orders" ? 700 : 400,
-            }}>Orders</button>
-          )}
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", marginLeft: "4px" }}>Hi, {user.name}!</span>
-          <button onClick={handleLogout} style={{
-            padding: "6px 12px", borderRadius: "8px",
-            border: "1px solid rgba(255,255,255,0.3)",
-            background: "transparent", color: "#fff",
-            cursor: "pointer", fontSize: "12px", marginLeft: "4px",
-          }}>Logout</button>
-        </div>
-      </nav>
+  <div style={{ display: "flex", gap: "4px", alignItems: "center", flexWrap: "wrap" }}>
+    {[
+      ["home", "Home"],
+      ["shop", "Shop"],
+      ["cart", `Cart${cart.length > 0 ? ` (${cart.reduce((s, i) => s + i.qty, 0)})` : ""}`],
+    ].map(([id, label]) => (
+      <button key={id} onClick={() => setPage(id)} style={{
+        padding: "8px 14px", borderRadius: "8px", border: "none",
+        background: page === id ? "rgba(255,255,255,0.2)" : "transparent",
+        color: "#fff", cursor: "pointer",
+        fontWeight: page === id ? 700 : 400, fontSize: "14px",
+      }}>{label}</button>
+    ))}
+    {user.uid !== "guest" && (
+      <button onClick={() => setPage("orders")} style={{
+        padding: "8px 14px", borderRadius: "8px", border: "none",
+        background: page === "orders" ? "rgba(255,255,255,0.2)" : "transparent",
+        color: "#fff", cursor: "pointer", fontSize: "14px",
+        fontWeight: page === "orders" ? 700 : 400,
+      }}>Orders</button>
+    )}
+    <button onClick={() => setPage("help")} style={{
+      padding: "8px 14px", borderRadius: "8px", border: "none",
+      background: page === "help" ? "rgba(255,255,255,0.2)" : "transparent",
+      color: "#fff", cursor: "pointer", fontSize: "14px",
+      fontWeight: page === "help" ? 700 : 400,
+    }}>Help</button>
+    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", marginLeft: "4px" }}>Hi, {user.name}!</span>
+    <button onClick={handleLogout} style={{
+      padding: "6px 12px", borderRadius: "8px",
+      border: "1px solid rgba(255,255,255,0.3)",
+      background: "transparent", color: "#fff",
+      cursor: "pointer", fontSize: "12px", marginLeft: "4px",
+    }}>Logout</button>
+  </div>
+</nav>
 
       {page === "home"     && <HomePage onShop={() => setPage("shop")} user={user} />}
       {page === "shop"     && <ShopPage cart={cart} setCart={setCart} onTryOn={handleTryOn} />}

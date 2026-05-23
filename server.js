@@ -4,6 +4,7 @@ import cors from 'cors';
 import { Client } from '@gradio/client';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -23,8 +24,9 @@ app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const gradioClient = await Client.connect("yisol/IDM-VTON", {
-hf_token: process.env.HF_TOKEN      });
+      const gradioClient = await Client.connect("Kwai-Kolors/Kolors-Virtual-Try-On", {
+        hf_token: process.env.HF_TOKEN
+      });
 
       const humanImage = new Blob([req.files['human'][0].buffer], {
         type: req.files['human'][0].mimetype
@@ -34,12 +36,9 @@ hf_token: process.env.HF_TOKEN      });
       });
 
       const result = await gradioClient.predict("/tryon", [
-        { background: humanImage, layers: [], composite: null },
+        humanImage,
         garmentImage,
-        "auto",
-        true,
-        true,
-        30,
+        "Keep the original background",
         42
       ]);
 
@@ -57,8 +56,10 @@ hf_token: process.env.HF_TOKEN      });
   }
   res.status(500).json({ success: false, error: lastError?.message || 'All retries failed' });
 });
+
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
+
 app.listen(3001, () => console.log('Try-on server running on port 3001'));

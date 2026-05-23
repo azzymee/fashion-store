@@ -40,6 +40,42 @@ async function uploadToCloudinary(buffer, mimetype) {
   });
 }
 
+// ✅ NEW: Poll LightX until image is ready
+async function pollLightXResult(orderId) {
+  const maxAttempts = 20;
+  const delayMs = 3000; // wait 3 seconds between each check
+
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, delayMs));
+
+    const res = await fetch('https://api.lightxeditor.com/external/api/v2/order-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.LIGHTX_API_KEY,
+      },
+      body: JSON.stringify({ orderId }),
+    });
+
+    const data = await res.json();
+    console.log(`Poll attempt ${i + 1}:`, JSON.stringify(data));
+
+    const status = data?.body?.status;
+    const imageUrl = data?.body?.output;
+
+    if (status === 'active' && imageUrl) {
+      return imageUrl;
+    }
+
+    if (status === 'failed') {
+      throw new Error('LightX processing failed');
+    }
+    // if status is 'init' or 'processing', keep waiting
+  }
+
+  throw new Error('Timed out waiting for LightX result');
+}
+
 app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
   console.log('=== TRY-ON REQUEST ===');
   try {
@@ -71,20 +107,20 @@ app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
     });
 
     const lightxData = await lightxRes.json();
-    console.log('LightX response:', JSON.stringify(lightxData));
+    console.log('LightX initial response:', JSON.stringify(lightxData));
 
     if (!lightxRes.ok) {
       throw new Error(lightxData.message || 'LightX API failed');
     }
 
-    const outputImage = lightxData?.body?.imageUrl 
-      || lightxData?.imageUrl 
-      || lightxData?.output 
-      || lightxData?.data?.imageUrl;
-
-    if (!outputImage) {
-      throw new Error('No output image in response: ' + JSON.stringify(lightxData));
+    // ✅ Get the orderId and poll for result
+    const orderId = lightxData?.body?.orderId;
+    if (!orderId) {
+      throw new Error('No orderId returned from LightX');
     }
+
+    console.log('Polling for result, orderId:', orderId);
+    const outputImage = await pollLightXResult(orderId);
 
     return res.json({ success: true, outputImage });
 

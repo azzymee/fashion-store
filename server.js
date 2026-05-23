@@ -6,7 +6,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 const app = express();
 app.use(cors());
 
@@ -24,8 +23,9 @@ app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const gradioClient = await Client.connect("Kwai-Kolors/Kolors-Virtual-Try-On", {
-        hf_token: process.env.HF_TOKEN
+      const gradioClient = await Client.connect("yisol/IDM-VTON", {
+        hf_token: process.env.HF_TOKEN,
+        headers: { "X-IP-Token": process.env.HF_TOKEN }
       });
 
       const humanImage = new Blob([req.files['human'][0].buffer], {
@@ -35,10 +35,13 @@ app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
         type: req.files['garment'][0].mimetype
       });
 
-      const result = await gradioClient.predict("/run", [
-        humanImage,
+      const result = await gradioClient.predict("/tryon", [
+        { background: humanImage, layers: [], composite: null },
         garmentImage,
-        "Keep the original background",
+        "auto",
+        true,
+        true,
+        30,
         42
       ]);
 

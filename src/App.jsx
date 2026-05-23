@@ -35,7 +35,7 @@ const C = {
   success: "#27ae60",
 };
 
-// ─── Products (ALL fields present: description, rating, reviews, colors) ──────
+// ─── Products ─────────────────────────────────────────────────────────────────
 const PRODUCTS = [
   {
     id: 1, name: "Bodycon Dress", price: 4500, category: "Dresses",
@@ -123,7 +123,6 @@ const PRODUCTS = [
   },
 ];
 
-// Category filter values must match product.category exactly (or "all")
 const CATEGORIES = ["all", "Tops", "Dresses", "Bottoms", "Accessories"];
 const fmt = (n) => `₦${Number(n).toLocaleString()}`;
 
@@ -338,7 +337,6 @@ function LoginPage({ onLogin }) {
         background: "#fff", borderRadius: "24px", padding: "40px",
         width: "100%", maxWidth: "420px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
       }}>
-        {/* ── Logo block: stacked cleanly ── */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <img
             src="/unilorin-logo.png"
@@ -351,7 +349,6 @@ function LoginPage({ onLogin }) {
           <p style={{ color: C.textMuted, fontSize: "13px", margin: 0 }}>University of Ilorin · Fashion Store</p>
         </div>
 
-        {/* Mode toggle */}
         <div style={{
           display: "flex", background: C.bgDark, borderRadius: "12px",
           padding: "4px", marginBottom: "24px",
@@ -518,18 +515,13 @@ function HomePage({ onShop, user }) {
       textAlign: "center", padding: "40px 20px",
       background: `linear-gradient(160deg, ${C.primary} 0%, ${C.primaryLight} 100%)`,
     }}>
-      {/* ── Unilorin logo: standalone, no crowding ── */}
       <img
         src="/unilorin-logo.png"
         alt="Unilorin"
         style={{ height: "64px", display: "block", marginBottom: "20px" }}
         onError={e => (e.target.style.display = "none")}
       />
-
-      {/* ── Dress emoji: its own line ── */}
       <div style={{ fontSize: "52px", lineHeight: 1, marginBottom: "10px" }}>👗</div>
-
-      {/* ── Brand name ── */}
       <h1 style={{
         fontSize: "clamp(32px, 6vw, 60px)", fontWeight: 900,
         margin: "0 0 6px", color: "#fff", letterSpacing: "-1px",
@@ -727,12 +719,24 @@ function TryOnPage({ product, onBack, onAddToCart }) {
 
   return (
     <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
-      <h2>Virtual Try-On</h2>
-      <p>Upload your photo to see how <strong>{product?.name}</strong> looks on you.</p>
+      <button onClick={onBack} style={{
+        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
+        color: C.textLight, padding: "8px 16px", cursor: "pointer",
+        marginBottom: "20px", fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "6px",
+      }}>← Back to Shop</button>
+
+      <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: 900, color: C.text }}>Virtual Try-On</h2>
+      <p style={{ color: C.textLight, marginBottom: "24px" }}>
+        Upload your photo to see how <strong>{product?.name}</strong> looks on you.
+      </p>
 
       <div style={{ marginBottom: '20px' }}>
-        <label style={{ display: 'inline-block', padding: '10px 20px', background: '#000', color: '#fff', cursor: 'pointer', borderRadius: '4px' }}>
-          Upload Your Photo
+        <label style={{
+          display: 'inline-block', padding: '10px 20px',
+          background: C.primary, color: '#fff', cursor: 'pointer',
+          borderRadius: '8px', fontSize: "14px", fontWeight: 700,
+        }}>
+          📷 Upload Your Photo
           <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
         </label>
       </div>
@@ -740,49 +744,83 @@ function TryOnPage({ product, onBack, onAddToCart }) {
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
         {userPhotoPreview && (
           <div>
-            <p><strong>Your Photo</strong></p>
-            <img src={userPhotoPreview} alt="Your photo" style={{ width: '250px', borderRadius: '8px' }} />
+            <p style={{ fontWeight: 700, marginBottom: "8px", color: C.text }}>Your Photo</p>
+            <img src={userPhotoPreview} alt="Your photo" style={{ width: '250px', borderRadius: '10px', border: `1px solid ${C.border}` }} />
           </div>
         )}
         {product?.image && (
           <div>
-            <p><strong>Garment</strong></p>
-            <img src={product.image} alt="Garment" style={{ width: '250px', borderRadius: '8px' }} />
+            <p style={{ fontWeight: 700, marginBottom: "8px", color: C.text }}>Garment</p>
+            <img src={product.image} alt="Garment" style={{ width: '250px', borderRadius: '10px', border: `1px solid ${C.border}` }} />
           </div>
         )}
       </div>
 
       {userPhoto && (
         <button onClick={handleTryOn} disabled={loading} style={{
-          padding: '12px 30px', background: loading ? '#888' : '#e44d26',
-          color: '#fff', border: 'none', borderRadius: '4px',
-          cursor: loading ? 'not-allowed' : 'pointer', fontSize: '16px'
+          padding: '12px 30px',
+          background: loading ? C.border : C.primary,
+          color: loading ? C.textMuted : '#fff',
+          border: 'none', borderRadius: '10px',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          fontSize: '15px', fontWeight: 700,
         }}>
-          {loading ? 'Generating... (30-60s)' : 'Generate AI Try-On'}
+          {loading ? '⏳ Generating... (30-60s)' : '✨ Generate AI Try-On'}
         </button>
       )}
 
-      {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
+      {error && (
+        <div style={{ marginTop: '10px', background: "#fdf0f0", padding: "14px 16px", borderRadius: "8px", border: "1px solid #f5c6cb" }}>
+          <div style={{ color: "#c0392b", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>⚠️ Try-On Unavailable</div>
+          <div style={{ color: "#666", fontSize: "13px", lineHeight: 1.6 }}>
+            The AI try-on service is temporarily busy. Please wait a few minutes and try again.
+          </div>
+        </div>
+      )}
 
       {resultImage && (
         <div style={{ marginTop: '30px' }}>
-          <h3>Result</h3>
-          <img src={resultImage} alt="Try-on result" style={{ width: '350px', borderRadius: '8px', display: 'block' }} />
-          <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <h3 style={{ fontWeight: 800, color: C.text, marginBottom: "12px" }}>Result</h3>
+          <img src={resultImage} alt="Try-on result" style={{ width: '350px', borderRadius: '10px', display: 'block', border: `1px solid ${C.border}` }} />
+          <div style={{ marginTop: '16px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <a
               href={resultImage}
               download="tryon-result.jpg"
-              style={{ padding: '10px 20px', background: '#000', color: '#fff', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}
+              style={{
+                padding: '10px 20px', background: C.primary,
+                color: '#fff', borderRadius: '8px',
+                textDecoration: 'none', fontSize: '14px', fontWeight: 700,
+              }}
             >
-              Save Image
+              💾 Save Image
             </a>
             <button
-              onClick={() => window.open(`https://wa.me/?text=Check%20out%20my%20virtual%20try-on!%20${encodeURIComponent(resultImage)}`, '_blank')}
-              style={{ padding: '10px 20px', background: '#25D366', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+              onClick={() => onAddToCart && onAddToCart(product)}
+              style={{
+                padding: '10px 20px', background: C.success,
+                color: '#fff', border: 'none', borderRadius: '8px',
+                cursor: 'pointer', fontSize: '14px', fontWeight: 700,
+              }}
             >
-              Share on WhatsApp
+              🛒 Add to Cart
+            </button>
+            <button
+              onClick={() => window.open(`https://wa.me/?text=Check%20out%20my%20virtual%20try-on!%20${encodeURIComponent(resultImage)}`, '_blank')}
+              style={{
+                padding: '10px 20px', background: C.green,
+                color: '#fff', border: 'none', borderRadius: '8px',
+                cursor: 'pointer', fontSize: '14px', fontWeight: 700,
+              }}
+            >
+              📱 Share on WhatsApp
             </button>
           </div>
+          <button onClick={onBack} style={{
+            marginTop: "20px", background: "none",
+            border: `1px solid ${C.border}`, borderRadius: "8px",
+            color: C.textLight, padding: "10px 20px",
+            cursor: "pointer", fontSize: "14px",
+          }}>← Back to Shopping</button>
         </div>
       )}
     </div>
@@ -790,7 +828,7 @@ function TryOnPage({ product, onBack, onAddToCart }) {
 }
 
 // ─── Cart Page ────────────────────────────────────────────────────────────────
-function CartPage({ cart, setCart, onCheckout }) {
+function CartPage({ cart, setCart, onCheckout, onBack }) {
   const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const updateQty = (id, delta) =>
     setCart(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(0, i.qty + delta) } : i).filter(i => i.qty > 0));
@@ -800,11 +838,22 @@ function CartPage({ cart, setCart, onCheckout }) {
       <div style={{ fontSize: "64px" }}>🛒</div>
       <h2 style={{ color: C.textMuted, marginTop: "16px" }}>Your cart is empty</h2>
       <p style={{ color: C.textLight }}>Add some items from the shop!</p>
+      <button onClick={onBack} style={{
+        marginTop: "16px", padding: "10px 24px",
+        background: C.primary, border: "none", borderRadius: "10px",
+        color: "#fff", fontWeight: 700, fontSize: "14px", cursor: "pointer",
+      }}>← Back to Shop</button>
     </div>
   );
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <button onClick={onBack} style={{
+        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
+        color: C.textLight, padding: "8px 16px", cursor: "pointer",
+        marginBottom: "20px", fontSize: "14px",
+      }}>← Back</button>
+
       <h2 style={{ fontSize: "28px", fontWeight: 900, margin: "0 0 24px", color: C.text }}>Your Cart ({cart.length})</h2>
       {cart.map(item => (
         <div key={item.id} style={{
@@ -838,7 +887,7 @@ function CartPage({ cart, setCart, onCheckout }) {
 }
 
 // ─── Checkout Page ────────────────────────────────────────────────────────────
-function CheckoutPage({ cart, user, onSuccess }) {
+function CheckoutPage({ cart, user, onSuccess, onBack }) {
   const [form, setForm] = useState({ name: user?.name || "", email: user?.email || "", phone: "", address: "" });
   const [payment, setPayment] = useState("card");
   const [card, setCard] = useState({ number: "", expiry: "", cvv: "" });
@@ -878,6 +927,12 @@ function CheckoutPage({ cart, user, onSuccess }) {
 
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
+      <button onClick={onBack} style={{
+        background: "none", border: `1px solid ${C.border}`, borderRadius: "8px",
+        color: C.textLight, padding: "8px 16px", cursor: "pointer",
+        marginBottom: "20px", fontSize: "14px",
+      }}>← Back to Cart</button>
+
       <h2 style={{ fontSize: "28px", fontWeight: 900, margin: "0 0 24px", color: C.text }}>Checkout</h2>
       <div style={{ background: C.bgCard, borderRadius: "14px", padding: "20px", border: `1px solid ${C.border}`, marginBottom: "16px" }}>
         <h3 style={{ margin: "0 0 16px", fontSize: "16px", color: C.primary }}>📦 Delivery Information</h3>
@@ -962,7 +1017,7 @@ function SuccessPage({ onHome }) {
   );
 }
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
+// ─── Help Page ────────────────────────────────────────────────────────────────
 function HelpPage({ onBack }) {
   const sections = [
     {
@@ -1050,10 +1105,13 @@ function HelpPage({ onBack }) {
     </div>
   );
 }
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [page, setPage] = useState("home");
+  const [pageHistory, setPageHistory] = useState([]);  // ← history stack
   const [cart, setCart] = useState([]);
   const [tryOnProduct, setTryOnProduct] = useState(null);
   const [toast, setToast] = useState(null);
@@ -1061,6 +1119,20 @@ export default function App() {
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  // ── Navigate to a new page, pushing current page onto history stack ────────
+  const navigate = (newPage) => {
+    setPageHistory(prev => [...prev, page]);
+    setPage(newPage);
+  };
+
+  // ── Go back to the previous page in history ────────────────────────────────
+  const goBack = () => {
+    if (pageHistory.length === 0) return;
+    const prev = pageHistory[pageHistory.length - 1];
+    setPageHistory(h => h.slice(0, -1));
+    setPage(prev);
   };
 
   useEffect(() => {
@@ -1079,10 +1151,32 @@ export default function App() {
     return () => unsub();
   }, []);
 
-  const handleLogin = (u) => { setUser(u); setPage("home"); };
-  const handleLogout = async () => { await signOut(auth); setUser(null); setCart([]); setPage("home"); };
-  const handleTryOn = (product) => { setTryOnProduct(product); setPage("tryon"); };
-  const handleSuccess = () => { setCart([]); setPage("success"); };
+  const handleLogin = (u) => {
+    setUser(u);
+    setPage("home");
+    setPageHistory([]);
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setUser(null);
+    setCart([]);
+    setPage("home");
+    setPageHistory([]);
+  };
+
+  const handleTryOn = (product) => {
+    setTryOnProduct(product);
+    navigate("tryon");
+  };
+
+  const handleSuccess = () => {
+    setCart([]);
+    // Clear history and go to success — back from success goes to shop
+    setPageHistory(["shop"]);
+    setPage("success");
+  };
+
   const addToCart = (product) => {
     setCart(prev => {
       const e = prev.find(i => i.id === product.id);
@@ -1107,94 +1201,95 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Segoe UI', sans-serif" }}>
       {toast && <Toast msg={toast.msg} type={toast.type} />}
 
-     {/* Navbar */}
-<nav style={{
-  background: C.primary, padding: "0 24px",
-  display: "flex", alignItems: "center", justifyContent: "space-between",
-  height: "62px", boxShadow: "0 4px 16px rgba(26,47,94,0.3)",
-  position: "sticky", top: 0, zIndex: 100,
-}}>
-  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    {page !== "home" && (
-      <button onClick={() => setPage("home")} style={{
-        background: "rgba(255,255,255,0.15)", border: "none",
-        borderRadius: "8px", color: "#fff", cursor: "pointer",
-        padding: "6px 12px", fontSize: "18px",
-      }}>←</button>
-    )}
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => setPage("home")}>
-      <img
-        src="/unilorin-logo.png"
-        height="36"
-        alt="Unilorin Logo"
-        onError={e => (e.target.style.display = "none")}
-        style={{ borderRadius: "4px" }}
-      />
-      <span style={{ fontSize: "20px", fontWeight: 900, color: "#fff" }}>TechFit</span>
-    </div>
-  </div>
+      {/* ── Navbar ── */}
+      <nav style={{
+        background: C.primary, padding: "0 24px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        height: "62px", boxShadow: "0 4px 16px rgba(26,47,94,0.3)",
+        position: "sticky", top: 0, zIndex: 100,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* ── Back arrow: only show when there's history ── */}
+          {pageHistory.length > 0 && (
+            <button onClick={goBack} style={{
+              background: "rgba(255,255,255,0.15)", border: "none",
+              borderRadius: "8px", color: "#fff", cursor: "pointer",
+              padding: "6px 12px", fontSize: "18px",
+            }}>←</button>
+          )}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
+            onClick={() => { setPageHistory(prev => [...prev, page]); setPage("home"); }}>
+            <img
+              src="/unilorin-logo.png"
+              height="36"
+              alt="Unilorin Logo"
+              onError={e => (e.target.style.display = "none")}
+              style={{ borderRadius: "4px" }}
+            />
+            <span style={{ fontSize: "20px", fontWeight: 900, color: "#fff" }}>TechFit</span>
+          </div>
+        </div>
 
-  <div style={{ display: "flex", gap: "4px", alignItems: "center", flexWrap: "wrap" }}>
-    {[
-      ["home", "Home"],
-      ["shop", "Shop"],
-      ["cart", `Cart${cart.length > 0 ? ` (${cart.reduce((s, i) => s + i.qty, 0)})` : ""}`],
-    ].map(([id, label]) => (
-      <button key={id} onClick={() => setPage(id)} style={{
-        padding: "8px 14px", borderRadius: "8px", border: "none",
-        background: page === id ? "rgba(255,255,255,0.2)" : "transparent",
-        color: "#fff", cursor: "pointer",
-        fontWeight: page === id ? 700 : 400, fontSize: "14px",
-      }}>{label}</button>
-    ))}
-    {user.uid !== "guest" && (
-      <button onClick={() => setPage("orders")} style={{
-        padding: "8px 14px", borderRadius: "8px", border: "none",
-        background: page === "orders" ? "rgba(255,255,255,0.2)" : "transparent",
-        color: "#fff", cursor: "pointer", fontSize: "14px",
-        fontWeight: page === "orders" ? 700 : 400,
-      }}>Orders</button>
-    )}
-    <button onClick={() => setPage("help")} style={{
-      padding: "8px 14px", borderRadius: "8px", border: "none",
-      background: page === "help" ? "rgba(255,255,255,0.2)" : "transparent",
-      color: "#fff", cursor: "pointer", fontSize: "14px",
-      fontWeight: page === "help" ? 700 : 400,
-    }}>Help</button>
-    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", marginLeft: "4px" }}>Hi, {user.name}!</span>
-    <button onClick={handleLogout} style={{
-      padding: "6px 12px", borderRadius: "8px",
-      border: "1px solid rgba(255,255,255,0.3)",
-      background: "transparent", color: "#fff",
-      cursor: "pointer", fontSize: "12px", marginLeft: "4px",
-    }}>Logout</button>
-  </div>
-</nav>
+        <div style={{ display: "flex", gap: "4px", alignItems: "center", flexWrap: "wrap" }}>
+          {[
+            ["home", "Home"],
+            ["shop", "Shop"],
+            ["cart", `Cart${cart.length > 0 ? ` (${cart.reduce((s, i) => s + i.qty, 0)})` : ""}`],
+          ].map(([id, label]) => (
+            <button key={id} onClick={() => navigate(id)} style={{
+              padding: "8px 14px", borderRadius: "8px", border: "none",
+              background: page === id ? "rgba(255,255,255,0.2)" : "transparent",
+              color: "#fff", cursor: "pointer",
+              fontWeight: page === id ? 700 : 400, fontSize: "14px",
+            }}>{label}</button>
+          ))}
+          {user.uid !== "guest" && (
+            <button onClick={() => navigate("orders")} style={{
+              padding: "8px 14px", borderRadius: "8px", border: "none",
+              background: page === "orders" ? "rgba(255,255,255,0.2)" : "transparent",
+              color: "#fff", cursor: "pointer", fontSize: "14px",
+              fontWeight: page === "orders" ? 700 : 400,
+            }}>Orders</button>
+          )}
+          <button onClick={() => navigate("help")} style={{
+            padding: "8px 14px", borderRadius: "8px", border: "none",
+            background: page === "help" ? "rgba(255,255,255,0.2)" : "transparent",
+            color: "#fff", cursor: "pointer", fontSize: "14px",
+            fontWeight: page === "help" ? 700 : 400,
+          }}>Help</button>
+          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", marginLeft: "4px" }}>Hi, {user.name}!</span>
+          <button onClick={handleLogout} style={{
+            padding: "6px 12px", borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.3)",
+            background: "transparent", color: "#fff",
+            cursor: "pointer", fontSize: "12px", marginLeft: "4px",
+          }}>Logout</button>
+        </div>
+      </nav>
 
-      {page === "home"     && <HomePage onShop={() => setPage("shop")} user={user} />}
+      {page === "home"     && <HomePage onShop={() => navigate("shop")} user={user} />}
       {page === "shop"     && <ShopPage cart={cart} setCart={setCart} onTryOn={handleTryOn} />}
-      {page === "tryon"    && <TryOnPage product={tryOnProduct} onBack={() => setPage("shop")} onAddToCart={addToCart} />}
-      {page === "cart"     && <CartPage cart={cart} setCart={setCart} onCheckout={() => setPage("checkout")} />}
-      {page === "checkout" && <CheckoutPage cart={cart} user={user} onSuccess={handleSuccess} />}
-      {page === "success"  && <SuccessPage onHome={() => setPage("shop")} />}
-      {page === "orders"   && <OrderHistory user={user} onBack={() => setPage("home")} />}
-        {page === "help" && <HelpPage onBack={() => setPage("home")} />}
+      {page === "tryon"    && <TryOnPage product={tryOnProduct} onBack={goBack} onAddToCart={addToCart} />}
+      {page === "cart"     && <CartPage cart={cart} setCart={setCart} onCheckout={() => navigate("checkout")} onBack={goBack} />}
+      {page === "checkout" && <CheckoutPage cart={cart} user={user} onSuccess={handleSuccess} onBack={goBack} />}
+      {page === "success"  && <SuccessPage onHome={() => { setPageHistory([]); setPage("shop"); }} />}
+      {page === "orders"   && <OrderHistory user={user} onBack={goBack} />}
+      {page === "help"     && <HelpPage onBack={goBack} />}
 
-      {/* Footer */}
-    <footer style={{
-  background: C.primary, color: "rgba(255,255,255,0.6)",
-  textAlign: "center", padding: "20px", fontSize: "13px", marginTop: "40px",
-}}>
-  © 2025 TechFit · University of Ilorin · Built by Apex Software corp.
-  <span style={{ margin: "0 10px" }}>·</span>
-  <span
-    onClick={() => setPage("help")}
-    style={{ color: "rgba(255,255,255,0.8)", cursor: "pointer", textDecoration: "underline" }}
-  >
-    User Guide
-  </span>
-</footer>
-      
+      {/* ── Footer ── */}
+      <footer style={{
+        background: C.primary, color: "rgba(255,255,255,0.6)",
+        textAlign: "center", padding: "20px", fontSize: "13px", marginTop: "40px",
+      }}>
+        © 2025 TechFit · University of Ilorin · Built by Apex Software corp.
+        <span style={{ margin: "0 10px" }}>·</span>
+        <span
+          onClick={() => navigate("help")}
+          style={{ color: "rgba(255,255,255,0.8)", cursor: "pointer", textDecoration: "underline" }}
+        >
+          User Guide
+        </span>
+      </footer>
     </div>
   );
 }

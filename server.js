@@ -1,13 +1,14 @@
 import express from 'express';
 import multer from 'multer';
 import cors from 'cors';
-import { Client } from '@gradio/client';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fetch from 'node-fetch';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -19,45 +20,87 @@ const uploadFields = upload.fields([
   { name: 'garment', maxCount: 1 }
 ]);
 
-app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
-  let lastError;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const gradioClient = await Client.connect("yisol/IDM-VTON", {
-        hf_token: process.env.HF_TOKEN,
-        headers: { "X-IP-Token": process.env.HF_TOKEN }
-      });
+// Convert buffer to base64 data URL
+function bufferToBase64(buffer, mimetype) {
+  return `data:${mimetype};base64,${buffer.toString('base64')}`;
+}
 
-      const humanImage = new Blob([req.files['human'][0].buffer], {
-        type: req.files['human'][0].mimetype
-      });
-      const garmentImage = new Blob([req.files['garment'][0].buffer], {
-        type: req.files['garment'][0].mimetype
-      });
+// Poll Replicate until result is ready
+async function pollReplicate(predictionId) {
+  const token = process.env.REPLICATE_API_TOKEN;
 
-      const result = await gradioClient.predict("/tryon", [
-        { background: humanImage, layers: [], composite: null },
-        garmentImage,
-        "auto",
-        true,
-        true,
-        30,
-        42
-      ]);
+  for (let i = 0; i < 30; i++) {
+    await new Promise(r => setTimeout(r, 4000));
 
-      return res.json({
-        success: true,
-        outputImage: result.data[0],
-        maskedImage: result.data[1]
-      });
+    const res = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
+      headers: {
+        Authorization: `Token ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-    } catch (error) {
-      lastError = error;
-      console.log(`Attempt ${attempt} failed, retrying in 5s...`);
-      await new Promise(r => setTimeout(r, 5000));
-    }
+    const data = await res.json();
+    console.log(`Poll ${i + 1}: status = ${data.status}`);
+
+    if (data.status === 'succeeded') return data.output;
+    if (data.status === 'failed') throw new Error(data.error || 'Prediction failed');
   }
-  res.status(500).json({ success: false, error: lastError?.message || 'All retries failed' });
+
+  throw new Error('Timed out waiting for try-on result');
+}
+
+app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
+  try {
+    const humanFile = req.files?.['human']?.[0];
+    const garmentFile = req.files?.['garment']?.[0];
+
+    if (!humanFile || !garmentFile) {
+      return res.status(400).json({ success: false, error: 'Both human and garment images are required' });
+    }
+
+    const humanBase64 = bufferToBase64(humanFile.buffer, humanFile.mimetype);
+    const garmentBase64 = bufferToBase64(garmentFile.buffer, garmentFile.mimetype);
+
+    // Start prediction on Replicate
+    const startRes = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        version: 'c871bb9b046607b680449ecbae55fd8c6d945e0a1948644bf2361b3d021d3ff4',
+        input: {
+          human_img: humanBase64,
+          garm_img: garmentBase64,
+          garment_des: 'clothing item',
+          is_checked: true,
+          is_checked_crop: false,
+          denoise_steps: 30,
+          seed: 42
+        }
+      })
+    });
+
+    const startData = await startRes.json();
+    console.log('Prediction started:', startData.id);
+
+    if (!startData.id) {
+      throw new Error(startData.detail || 'Failed to start prediction');
+    }
+
+    // Poll for result
+    const output = await pollReplicate(startData.id);
+
+    return res.json({
+      success: true,
+      outputImage: Array.isArray(output) ? output[0] : output
+    });
+
+  } catch (error) {
+    console.error('Try-on error:', error.message);
+    res.status(500).json({ success: false, error: error.message || 'Try-on failed' });
+  }
 });
 
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -65,4 +108,4 @@ app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(3001, () => console.log('Try-on server running on port 3001'));
+app.listen(3001, () => console.log('Server running on port 3001'));

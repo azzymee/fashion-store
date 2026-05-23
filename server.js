@@ -35,7 +35,7 @@ app.post('/api/virtual-tryon', uploadFields, async (req, res) => {
         type: req.files['garment'][0].mimetype
       });
 
-      const result = await gradioClient.predict("/tryon", [
+      const result = await gradioClient.predict("/run", [
         humanImage,
         garmentImage,
         "Keep the original background",
